@@ -25,4 +25,10 @@ export interface GeneCapsule {
 
 export interface GeneMapOptions {
   dbPath?: string;
+  /** Gene Registry Cloud base URL, e.g. https://helix-telemetry.haimobai-adrian.workers.dev. Falls back to process.env.GENE_REGISTRY_URL. */
+  registryUrl?: string;
+  /** Optional agent identifier sent with capsule pushes for provenance. Falls back to process.env.GENE_REGISTRY_AGENT_ID. */
+  agentId?: string;
+  /** Shared secret required by registry POST /v1/capsules. Falls back to process.env.GENE_REGISTRY_WRITE_KEY. Without it, syncToRegistry is a no-op. */
+  writeKey?: string;
 }

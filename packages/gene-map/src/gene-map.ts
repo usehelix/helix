@@ -1,5 +1,5 @@
 import Database from 'better-sqlite3';
-import type { GeneCapsule } from './types.js';
+import type { GeneCapsule, GeneMapOptions } from './types.js';
 
 function parseRow(row: Record<string, unknown>): GeneCapsule {
   return {
@@ -67,6 +67,9 @@ export function thompsonSample(qValue: number, qVariance: number): number {
 
 export class GeneMap {
   private static readonly SCHEMA_VERSION = 6;
+  private static readonly SDK_VERSION = '0.1.0';
+  /** Capsule wire-format version sent to Gene Registry Cloud. Bump when adding fields. */
+  private static readonly CAPSULE_SCHEMA_VERSION = 1;
   private db: Database.Database;
   private stmtLookup!: Database.Statement;
   private stmtUpsert!: Database.Statement;
@@ -76,8 +79,18 @@ export class GeneMap {
   private cache: Map<string, Record<string, unknown>> = new Map();
   private cacheLoadedAt = 0;
   private readonly CACHE_TTL_MS = 30_000;
+  private readonly registryUrl?: string;
+  private readonly agentId?: string;
+  private readonly writeKey?: string;
 
-  constructor(dbPath: string = ':memory:') {
+  constructor(dbPathOrOptions: string | GeneMapOptions = ':memory:') {
+    const opts: GeneMapOptions = typeof dbPathOrOptions === 'string'
+      ? { dbPath: dbPathOrOptions }
+      : dbPathOrOptions;
+    const dbPath = opts.dbPath ?? ':memory:';
+    this.registryUrl = opts.registryUrl ?? (typeof process !== 'undefined' ? process.env?.GENE_REGISTRY_URL : undefined);
+    this.agentId = opts.agentId ?? (typeof process !== 'undefined' ? process.env?.GENE_REGISTRY_AGENT_ID : undefined);
+    this.writeKey = opts.writeKey ?? (typeof process !== 'undefined' ? process.env?.GENE_REGISTRY_WRITE_KEY : undefined);
     this.db = new Database(dbPath);
     this.db.pragma('journal_mode = WAL');
     this.ensureSchema();
@@ -364,6 +377,95 @@ export class GeneMap {
 
   /** Expose the underlying database for shared tables. */
   get database(): Database.Database { return this.db; }
+
+  // ── Gene Registry Cloud sync ──
+  // Fire-and-forget by design: never blocks local execution. If the registry is
+  // down, slow, or unreachable, local Gene Map keeps working as if no registry
+  // were configured. Set registryUrl in the constructor or GENE_REGISTRY_URL env.
+
+  /** True if a registry endpoint is configured. Use to skip network calls when not needed. */
+  hasRegistry(): boolean { return !!this.registryUrl; }
+
+  /**
+   * Push a capsule to Gene Registry Cloud. Non-blocking — failures are swallowed
+   * silently so local execution is never coupled to registry availability.
+   * No-op if registryUrl or writeKey are missing (registry is opt-in).
+   * Call after a successful repair commit (i.e. once you've decided this capsule is worth sharing).
+   */
+  async syncToRegistry(capsule: GeneCapsule, opts: { platform?: string; chainId?: number } = {}): Promise<void> {
+    if (!this.registryUrl || !this.writeKey) return;
+    const platform = opts.platform ?? capsule.platforms?.[0] ?? 'generic';
+    try {
+      await fetch(`${this.registryUrl}/v1/capsules`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-registry-key': this.writeKey,
+        },
+        body: JSON.stringify({
+          failure_code: capsule.failureCode,
+          category: capsule.category,
+          platform,
+          strategy: capsule.strategy,
+          q_value: capsule.qValue,
+          success_count: capsule.successCount,
+          // qCount is cumulative attempts (incremented on every updateQValue,
+          // success or fail). For fresh/seeded capsules it's undefined — fall
+          // back to successCount, since seed data records only successes.
+          total_count: capsule.qCount ?? capsule.successCount,
+          avg_repair_ms: capsule.avgRepairMs,
+          capsule_schema_version: GeneMap.CAPSULE_SCHEMA_VERSION,
+          agent_id: this.agentId,
+          sdk_version: GeneMap.SDK_VERSION,
+          chain_id: opts.chainId,
+        }),
+        signal: AbortSignal.timeout(2000),
+      });
+    } catch {
+      // Silent — never block local execution for registry sync.
+    }
+  }
+
+  /**
+   * Look up a capsule from Gene Registry Cloud. Returns null on miss, error, or timeout.
+   * Call when local lookup misses to inherit experience from other agents.
+   */
+  async queryRegistry(failureCode: string, category?: string, platform?: string): Promise<{
+    failureCode: string;
+    category: string;
+    platform: string;
+    strategy: string;
+    qValue: number;
+    successCount: number;
+    totalCount: number;
+    avgRepairMs: number | null;
+  } | null> {
+    if (!this.registryUrl) return null;
+    try {
+      const params = new URLSearchParams({ code: failureCode });
+      if (category) params.set('category', category);
+      if (platform) params.set('platform', platform);
+      const res = await fetch(`${this.registryUrl}/v1/capsules?${params.toString()}`, {
+        signal: AbortSignal.timeout(2000),
+      });
+      if (!res.ok) return null;
+      const data = await res.json() as { found: boolean; capsule: Record<string, unknown> | null };
+      if (!data.found || !data.capsule) return null;
+      const c = data.capsule;
+      return {
+        failureCode: c.failure_code as string,
+        category: c.category as string,
+        platform: c.platform as string,
+        strategy: c.strategy as string,
+        qValue: c.q_value as number,
+        successCount: c.success_count as number,
+        totalCount: c.total_count as number,
+        avgRepairMs: (c.avg_repair_ms as number | null) ?? null,
+      };
+    } catch {
+      return null;
+    }
+  }
 
   close(): void { this.db.close(); }
 }

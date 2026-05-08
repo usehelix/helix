@@ -1,7 +1,13 @@
 name = "helix-telemetry"
 main = "telemetry-worker.js"
 compatibility_date = "2026-04-06"
+account_id = "b06ea550d1bdbe3ae9968a3dbb9d03a4"
 
 [[kv_namespaces]]
 binding = "HELIX_TELEMETRY"
 id = "00a7921adaff4d178165fa5fddd737fe"
+
+[[d1_databases]]
+binding = "GENE_REGISTRY"
+database_name = "gene-registry"
+database_id = "e0efacff-7812-4687-b89e-bbe7468a8271"

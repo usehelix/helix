@@ -1,11 +1,18 @@
 /**
- * Cloudflare Worker: Helix Telemetry + Gene Map API
+ * Cloudflare Worker: Helix Telemetry + Gene Registry Cloud
  *
- * POST /v1/event  — record repair events
- * GET  /v1/repair — lookup best repair strategy from Gene Map
+ * Telemetry (KV-backed, legacy):
+ *   POST /v1/event  — record repair events
+ *   GET  /v1/repair — lookup best repair strategy from KV genemap
+ *
+ * Gene Registry Cloud (D1-backed):
+ *   GET  /v1/capsules?code=&category=&platform=  — pull best capsule for an error
+ *   POST /v1/capsules                            — push a capsule from local Gene Map
+ *   GET  /v1/stats                               — registry health + counters
  */
 
-const CORS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, POST', 'Access-Control-Allow-Headers': 'Content-Type' };
+const CORS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type' };
+const JSON_HEADERS = { 'Content-Type': 'application/json', ...CORS };
 
 const BASELINE = {
   'auth_401':        { strategy: 'token_refresh',    confidence: 0.75, description: 'Refresh OAuth token via connector login flow' },
@@ -78,7 +85,167 @@ export default {
     const url = new URL(request.url);
 
     if (request.method === 'OPTIONS') {
-      return new Response(null, { headers: CORS });
+      return new Response(null, { status: 204, headers: CORS });
+    }
+
+    // ── GET /v1/capsules — pull best capsule for an error ──
+    if (url.pathname === '/v1/capsules' && request.method === 'GET') {
+      const code = url.searchParams.get('code');
+      if (!code) {
+        return new Response(JSON.stringify({ error: 'code is required' }), { status: 400, headers: JSON_HEADERS });
+      }
+      const category = url.searchParams.get('category');
+      const platform = url.searchParams.get('platform');
+      try {
+        let row;
+        if (category && platform) {
+          row = await env.GENE_REGISTRY.prepare(
+            `SELECT failure_code, category, platform, strategy, q_value, success_count, total_count, avg_repair_ms, capsule_schema_version
+             FROM capsules WHERE failure_code = ? AND category = ? AND platform = ?
+             ORDER BY q_value DESC LIMIT 1`
+          ).bind(code, category, platform).first();
+        } else if (category) {
+          row = await env.GENE_REGISTRY.prepare(
+            `SELECT failure_code, category, platform, strategy, q_value, success_count, total_count, avg_repair_ms, capsule_schema_version
+             FROM capsules WHERE failure_code = ? AND category = ?
+             ORDER BY q_value DESC LIMIT 1`
+          ).bind(code, category).first();
+        } else if (platform) {
+          row = await env.GENE_REGISTRY.prepare(
+            `SELECT failure_code, category, platform, strategy, q_value, success_count, total_count, avg_repair_ms, capsule_schema_version
+             FROM capsules WHERE failure_code = ? AND platform = ?
+             ORDER BY q_value DESC LIMIT 1`
+          ).bind(code, platform).first();
+        } else {
+          row = await env.GENE_REGISTRY.prepare(
+            `SELECT failure_code, category, platform, strategy, q_value, success_count, total_count, avg_repair_ms, capsule_schema_version
+             FROM capsules WHERE failure_code = ?
+             ORDER BY q_value DESC LIMIT 1`
+          ).bind(code).first();
+        }
+        if (!row) {
+          // Observability: log every miss so we know which capsules agents
+          // are asking for that we don't have yet (= candidates for seeding).
+          console.log(JSON.stringify({ event: 'capsule_get_miss', code, category, platform }));
+        }
+        return new Response(JSON.stringify({ found: !!row, capsule: row ?? null }), { headers: JSON_HEADERS });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: 'registry_error', message: String(err && err.message || err) }), { status: 500, headers: JSON_HEADERS });
+      }
+    }
+
+    // ── POST /v1/capsules — push a capsule from local Gene Map ──
+    if (url.pathname === '/v1/capsules' && request.method === 'POST') {
+      // Fail-closed auth: REGISTRY_WRITE_KEY must be configured in the worker
+      // env, and the request must present a matching x-registry-key header.
+      // GET /v1/capsules and /v1/stats remain public on purpose.
+      if (!env.REGISTRY_WRITE_KEY) {
+        console.log(JSON.stringify({ event: 'capsule_post_misconfigured' }));
+        return new Response(JSON.stringify({ error: 'registry_misconfigured' }), { status: 503, headers: JSON_HEADERS });
+      }
+      const provided = request.headers.get('x-registry-key');
+      if (provided !== env.REGISTRY_WRITE_KEY) {
+        console.log(JSON.stringify({ event: 'capsule_post_unauthorized' }));
+        return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: JSON_HEADERS });
+      }
+
+      try {
+        const body = await request.json();
+        const { failure_code, strategy } = body;
+        if (!failure_code || !strategy) {
+          return new Response(JSON.stringify({ error: 'failure_code and strategy are required' }), { status: 400, headers: JSON_HEADERS });
+        }
+        const category = body.category ?? 'generic';
+        const platform = body.platform ?? 'generic';
+        const q_value = typeof body.q_value === 'number' ? body.q_value : 0.5;
+        const success_count = body.success_count ?? 0;
+        const total_count = body.total_count ?? 0;
+        const avg_repair_ms = body.avg_repair_ms ?? null;
+        const agent_id = body.agent_id ?? null;
+        const sdk_version = body.sdk_version ?? null;
+        const chain_id = body.chain_id ?? null;
+        const capsule_schema_version = body.capsule_schema_version ?? 1;
+
+        // Upsert: keep highest q_value seen, sum counts, average repair-ms.
+        await env.GENE_REGISTRY.prepare(
+          `INSERT INTO capsules
+             (failure_code, category, platform, strategy, q_value,
+              success_count, total_count, avg_repair_ms, capsule_schema_version,
+              agent_id, sdk_version, chain_id, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+           ON CONFLICT(failure_code, category, platform, strategy) DO UPDATE SET
+             q_value = CASE WHEN excluded.q_value > q_value THEN excluded.q_value ELSE q_value END,
+             success_count = success_count + excluded.success_count,
+             total_count = total_count + excluded.total_count,
+             avg_repair_ms = CASE
+               WHEN avg_repair_ms IS NULL THEN excluded.avg_repair_ms
+               WHEN excluded.avg_repair_ms IS NULL THEN avg_repair_ms
+               ELSE (avg_repair_ms + excluded.avg_repair_ms) / 2
+             END,
+             capsule_schema_version = MAX(capsule_schema_version, excluded.capsule_schema_version),
+             agent_id = COALESCE(excluded.agent_id, agent_id),
+             sdk_version = COALESCE(excluded.sdk_version, sdk_version),
+             chain_id = COALESCE(excluded.chain_id, chain_id),
+             updated_at = datetime('now')`
+        ).bind(failure_code, category, platform, strategy, q_value,
+               success_count, total_count, avg_repair_ms, capsule_schema_version,
+               agent_id, sdk_version, chain_id).run();
+
+        // Increment cumulative repairs counter. Capsule/agent counts are
+        // computed live in GET /v1/stats — see comment on registry_stats.
+        await env.GENE_REGISTRY.prepare(
+          `UPDATE registry_stats SET
+             total_repairs = total_repairs + ?,
+             last_updated = datetime('now')
+           WHERE id = 1`
+        ).bind(success_count).run();
+
+        // Observability: log every accepted POST. agent_id may be null —
+        // log explicit "anonymous" so it's filterable.
+        console.log(JSON.stringify({
+          event: 'capsule_post_ok',
+          failure_code, category, platform, strategy,
+          agent_id: agent_id ?? 'anonymous',
+          q_value, success_count, total_count,
+          sdk_version, chain_id,
+        }));
+
+        return new Response(JSON.stringify({ ok: true }), { headers: JSON_HEADERS });
+      } catch (err) {
+        console.log(JSON.stringify({ event: 'capsule_post_error', message: String(err && err.message || err) }));
+        return new Response(JSON.stringify({ error: 'registry_error', message: String(err && err.message || err) }), { status: 500, headers: JSON_HEADERS });
+      }
+    }
+
+    // ── GET /v1/stats — registry health counters ──
+    // capsules and agents are LIVE counts so they stay correct under
+    // deletes/cleanup. repairs is cumulative (incremented on every POST).
+    if (url.pathname === '/v1/stats' && request.method === 'GET') {
+      try {
+        const counts = await env.GENE_REGISTRY.prepare(
+          `SELECT
+             (SELECT COUNT(*) FROM capsules) AS capsules,
+             (SELECT COUNT(DISTINCT agent_id) FROM capsules WHERE agent_id IS NOT NULL) AS agents`
+        ).first();
+        const stats = await env.GENE_REGISTRY.prepare(
+          `SELECT total_repairs, last_updated FROM registry_stats WHERE id = 1`
+        ).first();
+        const top = await env.GENE_REGISTRY.prepare(
+          `SELECT failure_code AS code, SUM(total_count) AS count
+             FROM capsules
+            GROUP BY failure_code
+            ORDER BY count DESC LIMIT 5`
+        ).all();
+        return new Response(JSON.stringify({
+          capsules: counts?.capsules ?? 0,
+          agents: counts?.agents ?? 0,
+          repairs: stats?.total_repairs ?? 0,
+          last_updated: stats?.last_updated ?? null,
+          top_errors: top?.results ?? [],
+        }), { headers: JSON_HEADERS });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: 'registry_error', message: String(err && err.message || err) }), { status: 500, headers: JSON_HEADERS });
+      }
     }
 
     // ── GET /v1/repair — Gene Map strategy lookup ──

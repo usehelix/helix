@@ -11,5 +11,6 @@ uniswap-ab-results/
 monad-ab-results/
 x402-v2-results/
 .env.save
+.env.local
 .wrangler/
 kv-keys.json
