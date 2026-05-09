@@ -5,6 +5,7 @@ import { GeneMap } from './gene-map.js';
 import { evaluate } from './evaluate.js';
 import { HelixProvider } from './provider.js';
 import type { CommitResult } from './provider.js';
+import { resolveRegistryConfig, pushCapsuleToRegistry, queryRegistry, registryCapsuleToCandidate } from './registry-bridge.js';
 import type {
   FailureClassification,
   GeneCapsule,
@@ -77,7 +78,18 @@ export class PcecEngine {
   /** Predictive Failure Graph: last failure for transition tracking */
   private lastFailure: { code: string; category: string; timestamp: number } | null = null;
   private otel: HelixOtel;
+  /** @deprecated since 2.7.3 — kept for backward compat, no longer instantiated. See registry-bridge.ts. */
   private registry?: GeneRegistryClient;
+  /** Resolved Gene Registry Cloud config (env > options). Undefined ⇒ Registry features disabled. */
+  private registryCfg?: import('./registry-bridge.js').RegistryRuntimeConfig;
+  /** Telemetry counters for Registry interactions — exposed via getMetrics(). */
+  private registrySyncCount = 0;
+  private registrySyncFailures = 0;
+  private registryQueryCount = 0;
+  private registryQueryHits = 0;
+  private registryQueryTimeouts = 0;
+  /** LLM Construct fallback fire count — for stress-test reporting. */
+  private llmConstructCalls = 0;
   private abTests: ABTestManager = new ABTestManager();
   private causalGraph: CausalGraph;
   private negativeKnowledge: NegativeKnowledge;
@@ -98,18 +110,46 @@ export class PcecEngine {
     this.safetyVerifier = new SafetyVerifier();
     this.adaptiveWeights = new AdaptiveWeights(geneMap.database);
     this.promptOptimizer = new PromptOptimizer(geneMap.database);
-    if (options?.registry?.url) {
-      this.registry = new GeneRegistryClient({ ...options.registry, agentId: this.agentId });
-      this.registry.startAutoSync(this.geneMap);
-    }
+    // Gene Registry Cloud — resolved from env (preferred) + options. The
+    // legacy GeneRegistryClient batch path is no longer instantiated; the
+    // bridge in engine/registry-bridge.ts handles per-commit push and
+    // per-miss query directly. See also: WrapOptions.registry JSDoc.
+    this.registryCfg = resolveRegistryConfig(options?.registry, this.agentId);
   }
 
-  /** Manually sync with Gene Registry (push local + pull remote). */
+  /**
+   * @deprecated since 2.7.3 — registry sync is now per-commit fire-and-forget,
+   * see registry-bridge.ts. This method is now a no-op for back compat.
+   */
   async syncRegistry(): Promise<{ pushed: number; pulled: number }> {
-    if (!this.registry) return { pushed: 0, pulled: 0 };
-    const pushResult = await this.registry.push(this.geneMap);
-    const pullResult = await this.registry.pull(this.geneMap);
-    return { pushed: pushResult.pushed, pulled: pullResult.pulled };
+    return { pushed: 0, pulled: 0 };
+  }
+
+  /**
+   * Telemetry counters for Gene Registry Cloud interactions on this engine.
+   * Used by the dogfood stress-test script and observability dashboards.
+   * Counts are monotonic; reset only by re-instantiating the engine.
+   */
+  getMetrics(): {
+    immuneHits: number;
+    repairs: number;
+    llmConstructCalls: number;
+    registrySyncCount: number;
+    registrySyncFailures: number;
+    registryQueryCount: number;
+    registryQueryHits: number;
+    registryQueryTimeouts: number;
+  } {
+    return {
+      immuneHits: this.stats.immuneHits,
+      repairs: this.stats.repairs,
+      llmConstructCalls: this.llmConstructCalls,
+      registrySyncCount: this.registrySyncCount,
+      registrySyncFailures: this.registrySyncFailures,
+      registryQueryCount: this.registryQueryCount,
+      registryQueryHits: this.registryQueryHits,
+      registryQueryTimeouts: this.registryQueryTimeouts,
+    };
   }
 
   private checkSystematic(failure: FailureClassification): string | null {
@@ -416,11 +456,32 @@ export class PcecEngine {
       });
     }
 
+    // ── REGISTRY QUERY (cross-agent procedural memory) ──
+    // Reached only when local Gene Map missed or had low confidence (the
+    // immune-path block above returns early on qValue > 0.3). 200ms hard
+    // timeout — on timeout/error we fall through to adapter+LLM as if
+    // Registry weren't configured. Hit becomes a synthetic RepairCandidate
+    // marked source='registry' and is prepended to the candidate list so
+    // Evaluate sees it ahead of adapter-built candidates.
+    let registryCandidate: import('./types.js').RepairCandidate | null = null;
+    if (this.registryCfg) {
+      this.registryQueryCount++;
+      const result = await queryRegistry(this.registryCfg, failure.code, failure.category, failure.platform);
+      if (result.outcome === 'hit' && result.capsule) {
+        this.registryQueryHits++;
+        registryCandidate = registryCapsuleToCandidate(result.capsule, failure);
+      } else if (result.outcome === 'timeout') {
+        this.registryQueryTimeouts++;
+      }
+    }
+
     // ── CONSTRUCT ──
     let candidates = this.constructCandidates(failure);
+    if (registryCandidate) candidates.unshift(registryCandidate);
 
     // ── LLM CONSTRUCT FALLBACK (when no adapter has strategies) ──
     if (candidates.length === 0 && this.options.llm?.enabled) {
+      this.llmConstructCalls++;
       try {
         const { llmConstructCandidates } = await import('./llm.js');
         // Trace-aware: pull last 3 same-code (then same-category fill) repair-audit
@@ -713,6 +774,24 @@ export class PcecEngine {
       this.otel.endRepairSpan(span, { success: true, immune: false, strategy: winner.strategy, code: failure.code, category: failure.category, totalMs, qValue: gene.qValue });
       this.otel.recordRepair({ success: true, immune: false, strategy: winner.strategy, code: failure.code, durationMs: totalMs });
       this.geneMap.recordAudit({ agentId: this.agentId, errorMessage: error.message, failureCode: failure.code, failureCategory: failure.category, strategy: winner.strategy, immune: false, success: true, mode, durationMs: totalMs, qBefore: existingGene?.qValue, overrides: commitResult.overrides, chainSteps: winner.steps?.map(s => s.strategy), predictions: predictions.length > 0 ? predictions.map(p => ({ code: p.code, probability: p.probability })) : undefined });
+
+      // ── REGISTRY SYNC (fire-and-forget) ──
+      // Push the just-committed capsule to Gene Registry Cloud so other
+      // agents on this code can inherit the strategy. Never blocks the
+      // PCEC return path. Only fires for non-immune commit-success (we
+      // skip immune re-pushes and never push failures).
+      if (this.registryCfg?.writeKey) {
+        const justCommitted = this.geneMap.lookup(failure.code, failure.category);
+        if (justCommitted) {
+          this.registrySyncCount++;
+          pushCapsuleToRegistry(this.registryCfg, justCommitted, {
+            platform: failure.platform,
+            chainId: typeof context?.chainId === 'number' ? context.chainId : undefined,
+            sdkVersion: 'helix-core/2.7.x',
+          }).then(ok => { if (!ok) this.registrySyncFailures++; })
+            .catch(() => { this.registrySyncFailures++; });
+        }
+      }
 
       return makeResult({
         success: true, mode, verified: true,

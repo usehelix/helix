@@ -1,8 +1,14 @@
 /**
- * Gene Registry Client — push/pull Genes to/from a shared registry.
+ * @deprecated since 2.7.3 — superseded by engine/registry-bridge.ts.
  *
- * The registry is an HTTP API that stores Gene data.
- * Local Gene Map always takes priority — registry Genes are additive only.
+ * This batch push/pull client targets a legacy HTTP API
+ * (POST /v1/genes/push, GET /v1/genes/pull) that was never deployed
+ * on the production Gene Registry Cloud worker. The current per-commit
+ * sync model (POST /v1/capsules, GET /v1/capsules) lives in
+ * registry-bridge.ts and is wired directly from PCEC.
+ *
+ * Kept here for type/import backward compatibility. PCEC no longer
+ * instantiates this class. Will be removed in a future major.
  */
 
 import type { GeneMap } from './gene-map.js';
@@ -44,6 +50,7 @@ export interface RegistryGene {
   verifiedByCount?: number;
 }
 
+/** @deprecated since 2.7.3 — see file header. */
 export class GeneRegistryClient {
   private url: string;
   private apiKey: string;

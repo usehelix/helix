@@ -1,6 +1,6 @@
 {
   "name": "@helix-agent/core",
-  "version": "2.7.2",
+  "version": "2.7.3",
   "description": "Agent payment intelligence — predict costs, optimize execution, fix failures. Powered by VialOS Runtime.",
   "type": "module",
   "main": "dist/index.js",

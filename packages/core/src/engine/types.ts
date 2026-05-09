@@ -108,7 +108,7 @@ export interface RepairCandidate {
   score: number;
   successProbability: number;
   platform: Platform;
-  source?: 'adapter' | 'gene' | 'llm';
+  source?: 'adapter' | 'gene' | 'llm' | 'registry';
   reasoning?: string;
 }
 
@@ -276,8 +276,33 @@ export interface WrapOptions {
   verify?: (result: unknown, originalArgs: unknown[]) => Promise<boolean> | boolean;
   /** OpenTelemetry configuration. Provide your own tracer/meter for distributed tracing and metrics. */
   otel?: { tracer?: any; meter?: any; serviceName?: string };
-  /** Gene Registry configuration for shared learning across instances. */
-  registry?: { url?: string; apiKey?: string; agentId?: string; minQualityForPush?: number; minQualityForPull?: number; syncIntervalMs?: number; pushBatchSize?: number; pullBatchSize?: number };
+  /**
+   * Gene Registry Cloud configuration for shared learning across instances.
+   * `url` and `writeKey` are the only fields used by the current per-commit
+   * sync model (see engine/registry-bridge.ts). Env vars take precedence:
+   *   GENE_REGISTRY_URL > options.registry.url
+   *   GENE_REGISTRY_WRITE_KEY > options.registry.writeKey > options.registry.apiKey
+   */
+  registry?: {
+    /** Gene Registry Cloud base URL, e.g. https://helix-telemetry.haimobai-adrian.workers.dev */
+    url?: string;
+    /** Shared secret for POST /v1/capsules. Sent as x-registry-key header. */
+    writeKey?: string;
+    /** @deprecated since 2.7.3 — fallback for legacy callers. Use `writeKey`. */
+    apiKey?: string;
+    /** Agent identifier sent with capsule pushes for provenance. */
+    agentId?: string;
+    /** @deprecated since 2.7.3 — legacy GeneRegistryClient batch knob, ignored. */
+    minQualityForPush?: number;
+    /** @deprecated since 2.7.3 — legacy GeneRegistryClient batch knob, ignored. */
+    minQualityForPull?: number;
+    /** @deprecated since 2.7.3 — legacy GeneRegistryClient batch knob, ignored. */
+    syncIntervalMs?: number;
+    /** @deprecated since 2.7.3 — legacy GeneRegistryClient batch knob, ignored. */
+    pushBatchSize?: number;
+    /** @deprecated since 2.7.3 — legacy GeneRegistryClient batch knob, ignored. */
+    pullBatchSize?: number;
+  };
   /** Callback to refresh session/auth token when renew_session strategy fires. */
   sessionRefresher?: () => Promise<Record<string, unknown> | string>;
   /** Config for split_transaction strategy. */
