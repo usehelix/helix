@@ -423,7 +423,11 @@ export class PcecEngine {
     if (candidates.length === 0 && this.options.llm?.enabled) {
       try {
         const { llmConstructCandidates } = await import('./llm.js');
-        const llmCandidates = await llmConstructCandidates(failure, error.message, this.options.llm);
+        // Trace-aware: pull last 3 same-code (then same-category fill) repair-audit
+        // rows for THIS agent so the LLM sees prior attempts + outcomes, not just
+        // the bare error code. See engine/llm.ts:buildConstructPrompt.
+        const traces = this.geneMap.getRecentTraces(failure.code, failure.category, this.agentId, 3);
+        const llmCandidates = await llmConstructCandidates(failure, error.message, this.options.llm, traces);
         if (llmCandidates && llmCandidates.length > 0) {
           candidates = llmCandidates;
           if (this.options.verbose) {

@@ -1,5 +1,5 @@
 import Database from 'better-sqlite3';
-import type { ErrorCode, FailureCategory, GeneCapsule, Platform, RepairContext } from './types.js';
+import type { ErrorCode, FailureCategory, GeneCapsule, Platform, RepairContext, TraceEntry } from './types.js';
 import { SEED_GENES } from './seed-genes.js';
 import { GenePredictiveGraph } from './gene-predict.js';
 import { runMigrations, needsMigration } from './migrations.js';
@@ -433,6 +433,71 @@ export class GeneMap {
 
   getFailedRepairs(failureCode: string, strategy: string, limit = 20): import('./failure-distiller.js').FailedRepairRecord[] {
     return this.db.prepare('SELECT failure_code as failureCode, category, strategy, error, repair_error as repairError, context, timestamp FROM failed_repairs WHERE failure_code = ? AND strategy = ? ORDER BY timestamp DESC LIMIT ?').all(failureCode, strategy, limit).map((r: any) => ({ ...r, context: JSON.parse(r.context || '{}') })) as any[];
+  }
+
+  /**
+   * Recent execution traces for trace-aware LLM Construct fallback.
+   * Returns up to `limit` rows: same-failure-code first (most relevant),
+   * then same-category fill-in if we don't have enough same-code rows.
+   * Each row is enriched with failed_repairs.repair_error via LEFT JOIN
+   * when an audit row and a failed_repair row share (code, strategy)
+   * within a 5-second window.
+   */
+  getRecentTraces(failureCode: string, category: string, agentId: string, limit: number = 3): TraceEntry[] {
+    // TODO Phase 2: cross-agent local widen — drop the agent_id filter when
+    // multi-agent fleet mode is enabled, so an agent can learn from sibling
+    // agents on the same machine. See ROADMAP.md procedural-memory phase.
+    const SELECT_COLS = `
+      ra.timestamp, ra.failure_code, ra.failure_category,
+      ra.strategy, ra.success, ra.immune, ra.duration_ms,
+      ra.q_before, ra.q_after, ra.error_message,
+      fr.repair_error
+    `;
+    const JOIN_FR = `
+      LEFT JOIN failed_repairs fr
+        ON fr.failure_code = ra.failure_code
+       AND fr.strategy     = ra.strategy
+       AND ABS(fr.timestamp - ra.timestamp) < 5000
+    `;
+
+    const sameCodeRows = this.db.prepare(`
+      SELECT ${SELECT_COLS}
+      FROM repair_audit ra
+      ${JOIN_FR}
+      WHERE ra.failure_code = ? AND ra.agent_id = ?
+      ORDER BY ra.timestamp DESC, ra.id DESC
+      LIMIT ?
+    `).all(failureCode, agentId, limit) as Record<string, unknown>[];
+
+    const toTrace = (r: Record<string, unknown>, tag: 'SAMECODE' | 'CATEGORY'): TraceEntry => ({
+      tag,
+      timestamp: r.timestamp as number,
+      failureCode: r.failure_code as string,
+      failureCategory: r.failure_category as string,
+      strategy: r.strategy as string,
+      success: !!r.success,
+      immune: !!r.immune,
+      durationMs: (r.duration_ms as number) ?? 0,
+      qBefore: (r.q_before as number | null) ?? null,
+      qAfter: (r.q_after as number | null) ?? null,
+      errorMessage: (r.error_message as string) ?? undefined,
+      repairError: (r.repair_error as string) ?? undefined,
+    });
+
+    const sameCode = sameCodeRows.map(r => toTrace(r, 'SAMECODE'));
+    if (sameCode.length >= limit) return sameCode;
+
+    const fillCount = limit - sameCode.length;
+    const categoryRows = this.db.prepare(`
+      SELECT ${SELECT_COLS}
+      FROM repair_audit ra
+      ${JOIN_FR}
+      WHERE ra.failure_category = ? AND ra.failure_code != ? AND ra.agent_id = ?
+      ORDER BY ra.timestamp DESC, ra.id DESC
+      LIMIT ?
+    `).all(category, failureCode, agentId, fillCount) as Record<string, unknown>[];
+
+    return [...sameCode, ...categoryRows.map(r => toTrace(r, 'CATEGORY'))];
   }
 
   // ── Multi-Dimensional Scores ──

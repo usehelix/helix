@@ -284,6 +284,29 @@ export interface WrapOptions {
   splitConfig?: { parts?: number; delayMs?: number; minAmount?: number };
 }
 
+// ── Trace Entry (PCEC Construct trace-aware fallback) ──────────
+// Materialized row from repair_audit (LEFT JOIN failed_repairs) used to
+// build trace-aware LLM Construct prompts. See gene-map.ts:getRecentTraces
+// and llm.ts:buildConstructPrompt for the producer/consumer ends.
+
+export interface TraceEntry {
+  /** SAMECODE = same failure_code as current; CATEGORY = same category, different code (broader pattern). */
+  tag: 'SAMECODE' | 'CATEGORY';
+  /** Wall-clock ms (Date.now()) — used for relative-time formatting. */
+  timestamp: number;
+  failureCode: string;
+  failureCategory: string;
+  strategy: string;
+  success: boolean;
+  immune: boolean;
+  durationMs: number;
+  qBefore?: number | null;
+  qAfter?: number | null;
+  errorMessage?: string;
+  /** From failed_repairs LEFT JOIN — only present when ✗ and recorded within 5s of audit. */
+  repairError?: string;
+}
+
 // ── Revenue estimates per category ──────────────────────────────
 
 export const REVENUE_AT_RISK: Record<string, number> = {
