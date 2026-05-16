@@ -1,0 +1,39 @@
+{
+  "workflow_id": "53b61a39-6168-4151-b882-2fbbeefd4ef8",
+  "mode": "bare",
+  "started_at": "2026-05-16T06:46:16.252Z",
+  "ended_at": "2026-05-16T06:46:26.958Z",
+  "duration_ms": 10706,
+  "e2e_success": false,
+  "hops": [
+    {
+      "hop_index": 0,
+      "outcome": "success",
+      "tx_id": "f665fd7f-2283-5bc7-adf5-e13c34e74db7",
+      "tx_hash": "0x598829fb3a8dc8203b3686d1dd61eedb68e085332a62a9dd140c1bc73e3ec01d",
+      "price_usdc": "0.001",
+      "duration_ms": 3414
+    },
+    {
+      "hop_index": 1,
+      "outcome": "success",
+      "tx_id": "39e71739-ba51-5341-9480-6d9463f953ba",
+      "tx_hash": "0x18c4f12e3f52cb28a4b5e91b71edce8ff3eefa86342421f447462096aedd3e5a",
+      "price_usdc": "0.001",
+      "duration_ms": 3585
+    },
+    {
+      "hop_index": 2,
+      "outcome": "failure",
+      "tx_id": "ec44e164-4a78-54a1-8f83-a9424c16ad25",
+      "tx_hash": "0x601c4323d8a47d5c9d4d8093eefc4ecf48d3c4586f4ea2bced746cb79f41d11a",
+      "price_usdc": "0.001",
+      "failure_step": "verify",
+      "failure_reason": "verify rejected: stale_quote",
+      "duration_ms": 3707
+    }
+  ],
+  "usdc_paid_onchain": "0.003000",
+  "usdc_paid_succeeded": "0.002000",
+  "wasted_usdc": "0.001000"
+}

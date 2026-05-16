@@ -1,0 +1,106 @@
+{
+  "workflow_id": "474be415-1c04-484c-9b10-7d0d3e9128e2",
+  "mode": "helix",
+  "started_at": "2026-05-16T08:59:43.877Z",
+  "ended_at": "2026-05-16T09:00:27.257Z",
+  "duration_ms": 43380,
+  "e2e_success": false,
+  "hops": [
+    {
+      "hop_index": 0,
+      "outcome": "success",
+      "tx_id": "087ec826-c657-5240-b048-e2c7df489f33",
+      "tx_hash": "0x07a565cadca5f8274f240a5d9902410fb3def900949c794f03e70bd25c36d394",
+      "price_usdc": "0.001",
+      "duration_ms": 11370,
+      "step_durations": {
+        "discover_ms": 83,
+        "estimate_ms": 0,
+        "pay_ms": 2927,
+        "verify_ms": 28
+      },
+      "quote_age_at_verify_ms": 2927,
+      "think_delay_ms": 8330,
+      "injected_503": false,
+      "preflight_applied": true,
+      "preflight_note": "audit has prior stale_quote; deferring discover until after think",
+      "late_discover_applied": true
+    },
+    {
+      "hop_index": 1,
+      "outcome": "success",
+      "tx_id": "28918547-eddc-527f-967d-b3df9e7c1cff",
+      "tx_hash": "0x045bae206ee52f15857b9d22e0481a6a35c87b9da13f51f7fe5c8ff8bf213de9",
+      "price_usdc": "0.001",
+      "duration_ms": 6650,
+      "step_durations": {
+        "discover_ms": 89,
+        "estimate_ms": 0,
+        "pay_ms": 2167,
+        "verify_ms": 26
+      },
+      "quote_age_at_verify_ms": 2167,
+      "think_delay_ms": 4366,
+      "injected_503": false,
+      "preflight_applied": true,
+      "preflight_note": "audit has prior stale_quote; deferring discover until after think",
+      "late_discover_applied": true
+    },
+    {
+      "hop_index": 2,
+      "outcome": "success",
+      "tx_id": "cdc89c6e-98c8-58d5-96ea-0300fbd6672c",
+      "tx_hash": "0xad786d89c90bbfbb7c2265492b9c0dcaeeac9b9889402dd29db52e8b9065eed3",
+      "price_usdc": "0.001",
+      "duration_ms": 9976,
+      "step_durations": {
+        "discover_ms": 79,
+        "estimate_ms": 0,
+        "pay_ms": 3618,
+        "verify_ms": 27
+      },
+      "quote_age_at_verify_ms": 3618,
+      "think_delay_ms": 6251,
+      "injected_503": false,
+      "preflight_applied": true,
+      "preflight_note": "audit has prior stale_quote; deferring discover until after think",
+      "late_discover_applied": true
+    },
+    {
+      "hop_index": 3,
+      "outcome": "success",
+      "tx_id": "dda4ba41-354a-5d2e-ae6a-679424664736",
+      "tx_hash": "0xc134930675551ed8954eed2fa43136e7003682b81c9897c8bed192bb735ad897",
+      "price_usdc": "0.001",
+      "duration_ms": 7787,
+      "step_durations": {
+        "discover_ms": 167,
+        "estimate_ms": 0,
+        "pay_ms": 2849,
+        "verify_ms": 25
+      },
+      "quote_age_at_verify_ms": 2849,
+      "think_delay_ms": 4744,
+      "injected_503": false,
+      "preflight_applied": true,
+      "preflight_note": "audit has prior stale_quote; deferring discover until after think",
+      "late_discover_applied": true
+    },
+    {
+      "hop_index": 4,
+      "outcome": "failure",
+      "failure_step": "discover",
+      "failure_reason": "SellerError(discover): discover 503: service unavailable (seeded)",
+      "duration_ms": 7596,
+      "step_durations": {},
+      "think_delay_ms": 7595,
+      "injected_503": true,
+      "preflight_applied": true,
+      "preflight_note": "audit has prior stale_quote; deferring discover until after think",
+      "late_discover_applied": true
+    }
+  ],
+  "usdc_paid_onchain": "0.004000",
+  "usdc_paid_succeeded": "0.004000",
+  "wasted_usdc": "0.000000"
+}

@@ -1,0 +1,163 @@
+{
+  "workflow_id": "96b7aa8b-9d12-4643-825a-a6eb544f4bf4",
+  "mode": "bare",
+  "started_at": "2026-05-16T07:47:54.207Z",
+  "ended_at": "2026-05-16T07:48:22.230Z",
+  "duration_ms": 28023,
+  "e2e_success": true,
+  "hops": [
+    {
+      "hop_index": 0,
+      "outcome": "success",
+      "tx_id": "4dd7990b-2f52-5be8-b7cb-bb0f189a793e",
+      "tx_hash": "0x0e23ae4e65b80255fc7404abb5c52874818d0829b97492d8aab7cdc5542dfc49",
+      "price_usdc": "0.001",
+      "duration_ms": 3608,
+      "step_durations": {
+        "discover_ms": 140,
+        "estimate_ms": 0,
+        "pay_ms": 3439,
+        "verify_ms": 29
+      },
+      "quote_age_at_verify_ms": 3439
+    },
+    {
+      "hop_index": 1,
+      "outcome": "success",
+      "tx_id": "3edeaac5-dcc4-53f5-bce7-17b2c1b3c22a",
+      "tx_hash": "0x29396e7944bbdfb08f85bb2485040dbd025de984610cba26f8431deed78e7f02",
+      "price_usdc": "0.001",
+      "duration_ms": 2873,
+      "step_durations": {
+        "discover_ms": 93,
+        "estimate_ms": 0,
+        "pay_ms": 2748,
+        "verify_ms": 32
+      },
+      "quote_age_at_verify_ms": 2748
+    },
+    {
+      "hop_index": 2,
+      "outcome": "success",
+      "tx_id": "ae11a917-86a8-5fab-9b8a-07ae7117b855",
+      "tx_hash": "0x90cb3ecbf61e11ce80dfd0d9da404607cbd247b1f5865eaf1d0bba1783d3afda",
+      "price_usdc": "0.001",
+      "duration_ms": 2832,
+      "step_durations": {
+        "discover_ms": 44,
+        "estimate_ms": 0,
+        "pay_ms": 2759,
+        "verify_ms": 29
+      },
+      "quote_age_at_verify_ms": 2759
+    },
+    {
+      "hop_index": 3,
+      "outcome": "success",
+      "tx_id": "fd121e80-ee28-5165-a6c6-1b251e61e172",
+      "tx_hash": "0xd1432b36a93a52130c11d93a1be15dce97f2010650880d64fd5c9d2fc887aa6c",
+      "price_usdc": "0.001",
+      "duration_ms": 2834,
+      "step_durations": {
+        "discover_ms": 30,
+        "estimate_ms": 0,
+        "pay_ms": 2774,
+        "verify_ms": 30
+      },
+      "quote_age_at_verify_ms": 2774
+    },
+    {
+      "hop_index": 4,
+      "outcome": "success",
+      "tx_id": "75c2be27-e1df-5944-91d0-7ee745d290c6",
+      "tx_hash": "0x839b8b6a2f543ee3589637b68138abb94a4028cffc2c7f06d2415c7fbe972fdd",
+      "price_usdc": "0.001",
+      "duration_ms": 2836,
+      "step_durations": {
+        "discover_ms": 33,
+        "estimate_ms": 0,
+        "pay_ms": 2774,
+        "verify_ms": 29
+      },
+      "quote_age_at_verify_ms": 2774
+    },
+    {
+      "hop_index": 5,
+      "outcome": "success",
+      "tx_id": "a3b8fdfa-6c84-565f-ba35-f9625a97d2fe",
+      "tx_hash": "0x22e12ee11d681e94b8d292176734ecc56bf9fdc41b8fec0ee3e2ae8440ed02f1",
+      "price_usdc": "0.001",
+      "duration_ms": 3452,
+      "step_durations": {
+        "discover_ms": 31,
+        "estimate_ms": 0,
+        "pay_ms": 3393,
+        "verify_ms": 28
+      },
+      "quote_age_at_verify_ms": 3393
+    },
+    {
+      "hop_index": 6,
+      "outcome": "success",
+      "tx_id": "01a43c53-bdc4-54e5-91f9-24647b851388",
+      "tx_hash": "0xe8726e4bc2cd53ccc2bcde76730f3ff180931c7265b5b95d26478bcb5fc3c5a3",
+      "price_usdc": "0.001",
+      "duration_ms": 2185,
+      "step_durations": {
+        "discover_ms": 31,
+        "estimate_ms": 0,
+        "pay_ms": 2122,
+        "verify_ms": 32
+      },
+      "quote_age_at_verify_ms": 2122
+    },
+    {
+      "hop_index": 7,
+      "outcome": "success",
+      "tx_id": "4554ac77-a04f-5882-a464-fecbdc80bb9c",
+      "tx_hash": "0x0e6748eb2768243eb7b2a8352c1e867b74187c3f56c4dd17c386a13ecdf8ff9c",
+      "price_usdc": "0.001",
+      "duration_ms": 2410,
+      "step_durations": {
+        "discover_ms": 32,
+        "estimate_ms": 0,
+        "pay_ms": 2346,
+        "verify_ms": 32
+      },
+      "quote_age_at_verify_ms": 2346
+    },
+    {
+      "hop_index": 8,
+      "outcome": "success",
+      "tx_id": "ed107440-1277-520d-af0e-22de73a72b5d",
+      "tx_hash": "0x5c97c7b494b23c19e1f5418ce2495dbdaf8db22fc5e924106f1ae04522bbc882",
+      "price_usdc": "0.001",
+      "duration_ms": 2831,
+      "step_durations": {
+        "discover_ms": 27,
+        "estimate_ms": 0,
+        "pay_ms": 2774,
+        "verify_ms": 30
+      },
+      "quote_age_at_verify_ms": 2774
+    },
+    {
+      "hop_index": 9,
+      "outcome": "success",
+      "tx_id": "dec66fff-27bb-5b89-a3aa-9d981b566ec7",
+      "tx_hash": "0x5404934abc7eac3749cedc403820f08e6e92ec359cac359e48a5e1425e015d12",
+      "price_usdc": "0.001",
+      "duration_ms": 2162,
+      "step_durations": {
+        "discover_ms": 31,
+        "estimate_ms": 0,
+        "pay_ms": 2106,
+        "verify_ms": 25
+      },
+      "quote_age_at_verify_ms": 2106
+    }
+  ],
+  "usdc_paid_onchain": "0.010000",
+  "usdc_paid_succeeded": "0.010000",
+  "wasted_usdc": "0.000000"
+}

@@ -250,6 +250,13 @@ export interface WrapOptions {
   onSystematic?: (warning: string, failure: FailureClassification) => void;
   /** Apply repair overrides to function args for retry. */
   parameterModifier?: (args: unknown[], overrides: Record<string, unknown>, strategy: string) => unknown[];
+  /**
+   * Pre-execution hook. Called BEFORE every call to the wrapped fn (including retries).
+   * Receives the current args; may return modifiedArgs to substitute, and an optional note.
+   * Errors thrown by preflight are swallowed (logged at warn level); original args are used.
+   * Use this to consult Gene Map / capsule history and proactively reshape args.
+   */
+  preflight?: (args: unknown[]) => Promise<{ modifiedArgs?: unknown[]; note?: string }>;
   context?: Record<string, unknown>;
   /** LLM fallback for classifying unknown errors. Disabled by default. */
   llm?: { provider?: 'anthropic' | 'openai'; apiKey?: string; fallbackApiKey?: string; model?: string; timeoutMs?: number; enabled?: boolean };

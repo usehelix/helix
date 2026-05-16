@@ -57,6 +57,17 @@ export function wrap<TArgs extends unknown[], TResult>(
 
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
+        if (options?.preflight) {
+          try {
+            const pf = await options.preflight(currentArgs as unknown[]);
+            if (pf?.modifiedArgs) currentArgs = pf.modifiedArgs as TArgs;
+            if (pf?.note) log.info(`preflight: ${pf.note}`);
+          } catch (pfErr) {
+            log.warn('preflight failed; proceeding with original args', {
+              err: pfErr instanceof Error ? pfErr.message : String(pfErr),
+            });
+          }
+        }
         const result = await fn(...currentArgs);
         if (attempt > 0) {
           // Business-level verify: check that the result is correct, not just successful

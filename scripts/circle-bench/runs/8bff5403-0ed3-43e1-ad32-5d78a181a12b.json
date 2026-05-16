@@ -1,0 +1,32 @@
+{
+  "workflow_id": "8bff5403-0ed3-43e1-ad32-5d78a181a12b",
+  "mode": "bare",
+  "started_at": "2026-05-16T09:13:01.843Z",
+  "ended_at": "2026-05-16T09:13:08.519Z",
+  "duration_ms": 6676,
+  "e2e_success": false,
+  "hops": [
+    {
+      "hop_index": 0,
+      "outcome": "failure",
+      "tx_id": "8534b9fb-26aa-5037-872d-796435f07f5e",
+      "tx_hash": "0xbd49e9c04268252ab008eb2ba1d4d15be1409ef05eca8bb9363e76cbc15557d5",
+      "price_usdc": "0.001",
+      "failure_step": "verify",
+      "failure_reason": "verify rejected: stale_quote",
+      "duration_ms": 6676,
+      "step_durations": {
+        "discover_ms": 28,
+        "estimate_ms": 0,
+        "pay_ms": 2184,
+        "verify_ms": 158
+      },
+      "quote_age_at_verify_ms": 6490,
+      "think_delay_ms": 4304,
+      "injected_503": false
+    }
+  ],
+  "usdc_paid_onchain": "0.001000",
+  "usdc_paid_succeeded": "0.000000",
+  "wasted_usdc": "0.001000"
+}

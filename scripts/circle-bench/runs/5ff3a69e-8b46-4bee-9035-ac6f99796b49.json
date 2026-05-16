@@ -1,0 +1,87 @@
+{
+  "workflow_id": "5ff3a69e-8b46-4bee-9035-ac6f99796b49",
+  "mode": "bare",
+  "started_at": "2026-05-16T06:45:23.810Z",
+  "ended_at": "2026-05-16T06:45:55.596Z",
+  "duration_ms": 31786,
+  "e2e_success": false,
+  "hops": [
+    {
+      "hop_index": 0,
+      "outcome": "success",
+      "tx_id": "f66c7846-a33f-5cf3-b2fb-be2c20c57176",
+      "tx_hash": "0xcd85c84eb2f5c9b7e9400376d423fae7cb100ac3a5eeea61c5e992970882f482",
+      "price_usdc": "0.001",
+      "duration_ms": 4332
+    },
+    {
+      "hop_index": 1,
+      "outcome": "success",
+      "tx_id": "779f344c-774a-520d-b66b-8a89344930c0",
+      "tx_hash": "0xf8f1f4a764d4a22d202fcd182b21b8f1148a0fc5c432bc30d2cf46cad2b434e7",
+      "price_usdc": "0.001",
+      "duration_ms": 3461
+    },
+    {
+      "hop_index": 2,
+      "outcome": "success",
+      "tx_id": "4050df9e-8c0f-5f2f-8fd6-0e4b7c7982bb",
+      "tx_hash": "0xf829bfdd261e25551e1802adabba88736f33c5a8e5e864a2ef3c4d062e092fbe",
+      "price_usdc": "0.001",
+      "duration_ms": 3483
+    },
+    {
+      "hop_index": 3,
+      "outcome": "success",
+      "tx_id": "e58489cd-0365-58f3-b708-8dec78dc0e5f",
+      "tx_hash": "0x3eefaf120f2d00594af9ebfa7fc964c890f4db72cf0eacbf981227e2d8fe0c66",
+      "price_usdc": "0.001",
+      "duration_ms": 3467
+    },
+    {
+      "hop_index": 4,
+      "outcome": "success",
+      "tx_id": "52eefab2-2b3e-5a1e-9540-20a8964d5d4b",
+      "tx_hash": "0x126d463b24e4d6a2f0b11585dceea423c8b9ce243c56d023a46a10f0cd7884a3",
+      "price_usdc": "0.001",
+      "duration_ms": 3410
+    },
+    {
+      "hop_index": 5,
+      "outcome": "success",
+      "tx_id": "1ae2fd47-6f39-5ff3-b13f-8755436c3298",
+      "tx_hash": "0x01059ed7bdb625f5f48a23f15d7fb3f66d546b9d39a7611073bce5c8e56b6c70",
+      "price_usdc": "0.001",
+      "duration_ms": 3405
+    },
+    {
+      "hop_index": 6,
+      "outcome": "success",
+      "tx_id": "ae413074-a27b-59c7-8d8e-bb40881eaa24",
+      "tx_hash": "0xfd83360e56b3e9a34bdcc60d51e88849081258309fcc4b719a2009dfbe177ece",
+      "price_usdc": "0.001",
+      "duration_ms": 3391
+    },
+    {
+      "hop_index": 7,
+      "outcome": "success",
+      "tx_id": "2fc1b896-b2e6-5621-9b8b-56e66b26c7ba",
+      "tx_hash": "0x0aa93178be25dc2af1be748a55727efe94e5dcb31ba54dd010b319ac5e80a872",
+      "price_usdc": "0.001",
+      "duration_ms": 3460
+    },
+    {
+      "hop_index": 8,
+      "outcome": "failure",
+      "tx_id": "2e34be95-f0e4-50cc-8539-a255a9d9d436",
+      "tx_hash": "0x1bba391cd6f81ac918e572ba71a86f8801945697b91e0f6122683a00d5a218d7",
+      "price_usdc": "0.001",
+      "failure_step": "verify",
+      "failure_reason": "verify rejected: stale_quote",
+      "duration_ms": 3377
+    }
+  ],
+  "usdc_paid_onchain": "0.009000",
+  "usdc_paid_succeeded": "0.008000",
+  "wasted_usdc": "0.001000"
+}

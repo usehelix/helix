@@ -1,0 +1,30 @@
+{
+  "git_sha": "ce331a8b79e1177c650fa15f9d15ed393ecdaecf",
+  "mode": "bare",
+  "n_workflows": 1,
+  "n_hops": 10,
+  "fail_rate": 0,
+  "ttl_ms": 300000,
+  "started_at": "2026-05-16T07:47:54.206Z",
+  "ended_at": "2026-05-16T07:48:22.231Z",
+  "duration_ms": 28024,
+  "summary": {
+    "e2e_success_count": 1,
+    "e2e_success_rate": 1,
+    "usdc_paid_onchain": "0.010000",
+    "usdc_paid_succeeded": "0.010000",
+    "wasted_usdc": "0.000000"
+  },
+  "all_tx_hashes": [
+    "0x0e23ae4e65b80255fc7404abb5c52874818d0829b97492d8aab7cdc5542dfc49",
+    "0x29396e7944bbdfb08f85bb2485040dbd025de984610cba26f8431deed78e7f02",
+    "0x90cb3ecbf61e11ce80dfd0d9da404607cbd247b1f5865eaf1d0bba1783d3afda",
+    "0xd1432b36a93a52130c11d93a1be15dce97f2010650880d64fd5c9d2fc887aa6c",
+    "0x839b8b6a2f543ee3589637b68138abb94a4028cffc2c7f06d2415c7fbe972fdd",
+    "0x22e12ee11d681e94b8d292176734ecc56bf9fdc41b8fec0ee3e2ae8440ed02f1",
+    "0xe8726e4bc2cd53ccc2bcde76730f3ff180931c7265b5b95d26478bcb5fc3c5a3",
+    "0x0e6748eb2768243eb7b2a8352c1e867b74187c3f56c4dd17c386a13ecdf8ff9c",
+    "0x5c97c7b494b23c19e1f5418ce2495dbdaf8db22fc5e924106f1ae04522bbc882",
+    "0x5404934abc7eac3749cedc403820f08e6e92ec359cac359e48a5e1425e015d12"
+  ]
+}

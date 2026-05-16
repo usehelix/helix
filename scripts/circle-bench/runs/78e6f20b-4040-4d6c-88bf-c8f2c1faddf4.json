@@ -1,0 +1,23 @@
+{
+  "workflow_id": "78e6f20b-4040-4d6c-88bf-c8f2c1faddf4",
+  "mode": "bare",
+  "started_at": "2026-05-16T08:06:40.266Z",
+  "ended_at": "2026-05-16T08:06:40.266Z",
+  "duration_ms": 0,
+  "e2e_success": false,
+  "hops": [
+    {
+      "hop_index": 0,
+      "outcome": "failure",
+      "failure_step": "discover",
+      "failure_reason": "SellerError(discover): discover 503: service unavailable (seeded)",
+      "duration_ms": 0,
+      "step_durations": {},
+      "think_delay_ms": 3092,
+      "injected_503": true
+    }
+  ],
+  "usdc_paid_onchain": "0.000000",
+  "usdc_paid_succeeded": "0.000000",
+  "wasted_usdc": "0.000000"
+}

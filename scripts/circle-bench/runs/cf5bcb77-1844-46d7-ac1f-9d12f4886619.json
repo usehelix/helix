@@ -1,0 +1,84 @@
+{
+  "workflow_id": "cf5bcb77-1844-46d7-ac1f-9d12f4886619",
+  "mode": "bare",
+  "started_at": "2026-05-16T06:46:59.422Z",
+  "ended_at": "2026-05-16T06:47:26.826Z",
+  "duration_ms": 27404,
+  "e2e_success": false,
+  "hops": [
+    {
+      "hop_index": 0,
+      "outcome": "success",
+      "tx_id": "45471089-2334-5f01-b16e-cee330e456f4",
+      "tx_hash": "0x21773ac263aa28a31490918419d9c6c3e34554fd940f883a175da21c83a08894",
+      "price_usdc": "0.001",
+      "duration_ms": 3384
+    },
+    {
+      "hop_index": 1,
+      "outcome": "success",
+      "tx_id": "8ed737e4-ba39-55c0-a245-fbab2e0868bf",
+      "tx_hash": "0x8b90c8ad966cb7e2ef8ceabfde7df10dafa766a4a7327d89fdb36a78288c9cfb",
+      "price_usdc": "0.001",
+      "duration_ms": 3555
+    },
+    {
+      "hop_index": 2,
+      "outcome": "success",
+      "tx_id": "14e9c0e3-f039-534c-a47c-f7f3904a0b61",
+      "tx_hash": "0xd380e3240b9e5f2651e1136a5a4e46d1cfc9f920fd272c16073828a1d95c022e",
+      "price_usdc": "0.001",
+      "duration_ms": 3417
+    },
+    {
+      "hop_index": 3,
+      "outcome": "success",
+      "tx_id": "b8bf777b-fe84-5352-b35b-b1a598e9863b",
+      "tx_hash": "0xe0a0940d9c8c7b630a388fec99dfad93bdd6b33d4c286a23edde466453509d65",
+      "price_usdc": "0.001",
+      "duration_ms": 3428
+    },
+    {
+      "hop_index": 4,
+      "outcome": "success",
+      "tx_id": "87a22de8-5a3a-56f2-b59b-bdf67cb313d2",
+      "tx_hash": "0xe735d9c1effec78b5b918241524b583dea96fd18581b157863183688a37f6459",
+      "price_usdc": "0.001",
+      "duration_ms": 3394
+    },
+    {
+      "hop_index": 5,
+      "outcome": "success",
+      "tx_id": "9b59baaa-111c-5a1b-a568-0a60556b1012",
+      "tx_hash": "0xc659840ef130219d6f6e4f535861d901b99eef97582c2b3214b20af98910bc36",
+      "price_usdc": "0.001",
+      "duration_ms": 3389
+    },
+    {
+      "hop_index": 6,
+      "outcome": "success",
+      "tx_id": "4de5fa92-6b7f-54dc-8953-17de4e37c10a",
+      "tx_hash": "0x08456f86c452563a86cb0f0d4a6dab97346389fc3e3be3341f13b1062815ce81",
+      "price_usdc": "0.001",
+      "duration_ms": 3426
+    },
+    {
+      "hop_index": 7,
+      "outcome": "success",
+      "tx_id": "0f8308f4-8ab9-5fbd-ba5a-4c2f1bd2f7bf",
+      "tx_hash": "0x26642601256328ec184f8946097ac56f341d3c9d9be5eb23405c94886d37a7d4",
+      "price_usdc": "0.001",
+      "duration_ms": 3378
+    },
+    {
+      "hop_index": 8,
+      "outcome": "failure",
+      "failure_step": "discover",
+      "failure_reason": "SellerError(discover): discover 503: {\"error\":\"service unavailable\"}",
+      "duration_ms": 33
+    }
+  ],
+  "usdc_paid_onchain": "0.008000",
+  "usdc_paid_succeeded": "0.008000",
+  "wasted_usdc": "0.000000"
+}

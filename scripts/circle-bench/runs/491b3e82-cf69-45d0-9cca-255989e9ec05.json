@@ -1,0 +1,26 @@
+{
+  "workflow_id": "491b3e82-cf69-45d0-9cca-255989e9ec05",
+  "mode": "helix",
+  "started_at": "2026-05-16T08:23:45.225Z",
+  "ended_at": "2026-05-16T08:23:48.319Z",
+  "duration_ms": 3094,
+  "e2e_success": false,
+  "hops": [
+    {
+      "hop_index": 0,
+      "outcome": "failure",
+      "failure_step": "discover",
+      "failure_reason": "SellerError(discover): discover 503: service unavailable (seeded)",
+      "duration_ms": 3094,
+      "step_durations": {},
+      "think_delay_ms": 3092,
+      "injected_503": true,
+      "preflight_applied": true,
+      "preflight_note": "audit has prior stale_quote; deferring discover until after think",
+      "late_discover_applied": true
+    }
+  ],
+  "usdc_paid_onchain": "0.000000",
+  "usdc_paid_succeeded": "0.000000",
+  "wasted_usdc": "0.000000"
+}

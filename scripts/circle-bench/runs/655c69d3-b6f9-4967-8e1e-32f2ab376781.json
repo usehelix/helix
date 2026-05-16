@@ -1,0 +1,213 @@
+{
+  "workflow_id": "655c69d3-b6f9-4967-8e1e-32f2ab376781",
+  "mode": "helix",
+  "started_at": "2026-05-16T08:24:34.538Z",
+  "ended_at": "2026-05-16T08:26:00.001Z",
+  "duration_ms": 85463,
+  "e2e_success": true,
+  "hops": [
+    {
+      "hop_index": 0,
+      "outcome": "success",
+      "tx_id": "50720eb7-8ae8-5691-9a8d-4953c33d9add",
+      "tx_hash": "0xd705ad08588cfb493199d4f66d7714544dc81b5ff03d602daa6e36f298f03d28",
+      "price_usdc": "0.001",
+      "duration_ms": 6199,
+      "step_durations": {
+        "discover_ms": 101,
+        "estimate_ms": 0,
+        "pay_ms": 2923,
+        "verify_ms": 29
+      },
+      "quote_age_at_verify_ms": 2923,
+      "think_delay_ms": 3145,
+      "injected_503": false,
+      "preflight_applied": true,
+      "preflight_note": "audit has prior stale_quote; deferring discover until after think",
+      "late_discover_applied": true
+    },
+    {
+      "hop_index": 1,
+      "outcome": "success",
+      "tx_id": "8c3a9ac0-d31a-5ecf-aff3-f8706dff06b8",
+      "tx_hash": "0xee3c3a301d6137c20894e188ec1f7ec4e8111aa7454b054c794f9446352b1cdc",
+      "price_usdc": "0.001",
+      "duration_ms": 8799,
+      "step_durations": {
+        "discover_ms": 89,
+        "estimate_ms": 0,
+        "pay_ms": 2797,
+        "verify_ms": 28
+      },
+      "quote_age_at_verify_ms": 2797,
+      "think_delay_ms": 5884,
+      "injected_503": false,
+      "preflight_applied": true,
+      "preflight_note": "audit has prior stale_quote; deferring discover until after think",
+      "late_discover_applied": true
+    },
+    {
+      "hop_index": 2,
+      "outcome": "success",
+      "tx_id": "0b2b344b-3e7a-5059-9ad3-fb1d3beebfa1",
+      "tx_hash": "0x75c46c2f038006f26372b53d026edf4275c78ea9b4f3b8bec7fcdff6873ddc5f",
+      "price_usdc": "0.001",
+      "duration_ms": 7970,
+      "step_durations": {
+        "discover_ms": 89,
+        "estimate_ms": 0,
+        "pay_ms": 3010,
+        "verify_ms": 24
+      },
+      "quote_age_at_verify_ms": 3010,
+      "think_delay_ms": 4846,
+      "injected_503": false,
+      "preflight_applied": true,
+      "preflight_note": "audit has prior stale_quote; deferring discover until after think",
+      "late_discover_applied": true
+    },
+    {
+      "hop_index": 3,
+      "outcome": "success",
+      "tx_id": "e02ad608-4bb9-5495-bd40-c36ab8d6efdf",
+      "tx_hash": "0x4a41534ccd6e5a03f01eb0616c6336617cc323d38fbec8554119a9b71b64f192",
+      "price_usdc": "0.001",
+      "duration_ms": 11190,
+      "step_durations": {
+        "discover_ms": 84,
+        "estimate_ms": 0,
+        "pay_ms": 2948,
+        "verify_ms": 23
+      },
+      "quote_age_at_verify_ms": 2948,
+      "think_delay_ms": 8134,
+      "injected_503": false,
+      "preflight_applied": true,
+      "preflight_note": "audit has prior stale_quote; deferring discover until after think",
+      "late_discover_applied": true
+    },
+    {
+      "hop_index": 4,
+      "outcome": "success",
+      "tx_id": "5fe8009d-de5e-5aeb-b4b1-cd5b4824166a",
+      "tx_hash": "0xf089280596a6240ceba29a0beb0271c66ccaea3251028be0ee935f7df9125073",
+      "price_usdc": "0.001",
+      "duration_ms": 8846,
+      "step_durations": {
+        "discover_ms": 90,
+        "estimate_ms": 0,
+        "pay_ms": 2884,
+        "verify_ms": 27
+      },
+      "quote_age_at_verify_ms": 2884,
+      "think_delay_ms": 5844,
+      "injected_503": false,
+      "preflight_applied": true,
+      "preflight_note": "audit has prior stale_quote; deferring discover until after think",
+      "late_discover_applied": true
+    },
+    {
+      "hop_index": 5,
+      "outcome": "success",
+      "tx_id": "3747260f-1774-5e3b-86ff-38eac75f0eff",
+      "tx_hash": "0xf5f93a90214d1c4b43b7f9ed943bff227994c72ad0c2ba4d5833e4fbed43eb9a",
+      "price_usdc": "0.001",
+      "duration_ms": 6804,
+      "step_durations": {
+        "discover_ms": 31,
+        "estimate_ms": 0,
+        "pay_ms": 2756,
+        "verify_ms": 24
+      },
+      "quote_age_at_verify_ms": 2756,
+      "think_delay_ms": 3993,
+      "injected_503": false,
+      "preflight_applied": true,
+      "preflight_note": "audit has prior stale_quote; deferring discover until after think",
+      "late_discover_applied": true
+    },
+    {
+      "hop_index": 6,
+      "outcome": "success",
+      "tx_id": "8b714299-b611-53ed-8a99-52b32f575be1",
+      "tx_hash": "0x58b8d63826f4d0c41d7cdfc83feeb4976ab483440ebcc00418525da783945883",
+      "price_usdc": "0.001",
+      "duration_ms": 11549,
+      "step_durations": {
+        "discover_ms": 95,
+        "estimate_ms": 0,
+        "pay_ms": 3349,
+        "verify_ms": 24
+      },
+      "quote_age_at_verify_ms": 3349,
+      "think_delay_ms": 8080,
+      "injected_503": false,
+      "preflight_applied": true,
+      "preflight_note": "audit has prior stale_quote; deferring discover until after think",
+      "late_discover_applied": true
+    },
+    {
+      "hop_index": 7,
+      "outcome": "success",
+      "tx_id": "508294a0-8b8c-5e2f-b68a-0d7321704260",
+      "tx_hash": "0x7e04392a7068de397d0e8113e1c14b3bd692fb42be6af5248d4e1aea9d7223fb",
+      "price_usdc": "0.001",
+      "duration_ms": 9093,
+      "step_durations": {
+        "discover_ms": 85,
+        "estimate_ms": 0,
+        "pay_ms": 2357,
+        "verify_ms": 27
+      },
+      "quote_age_at_verify_ms": 2357,
+      "think_delay_ms": 6623,
+      "injected_503": false,
+      "preflight_applied": true,
+      "preflight_note": "audit has prior stale_quote; deferring discover until after think",
+      "late_discover_applied": true
+    },
+    {
+      "hop_index": 8,
+      "outcome": "success",
+      "tx_id": "8684a574-65cc-5e00-bf59-b868bb7df0f7",
+      "tx_hash": "0x9ad038d4621f367f2bebced8c695debc8cefba970d0e0cc9ba3ae6691e211966",
+      "price_usdc": "0.001",
+      "duration_ms": 6129,
+      "step_durations": {
+        "discover_ms": 34,
+        "estimate_ms": 0,
+        "pay_ms": 3063,
+        "verify_ms": 29
+      },
+      "quote_age_at_verify_ms": 3063,
+      "think_delay_ms": 3002,
+      "injected_503": false,
+      "preflight_applied": true,
+      "preflight_note": "audit has prior stale_quote; deferring discover until after think",
+      "late_discover_applied": true
+    },
+    {
+      "hop_index": 9,
+      "outcome": "success",
+      "tx_id": "8b8c63df-b37a-5a37-89e9-1dfeefe95094",
+      "tx_hash": "0x8ee0351c24c1f47c259468971517f617f17953573dd001796025122daad2b023",
+      "price_usdc": "0.001",
+      "duration_ms": 8879,
+      "step_durations": {
+        "discover_ms": 83,
+        "estimate_ms": 0,
+        "pay_ms": 2809,
+        "verify_ms": 27
+      },
+      "quote_age_at_verify_ms": 2809,
+      "think_delay_ms": 5959,
+      "injected_503": false,
+      "preflight_applied": true,
+      "preflight_note": "audit has prior stale_quote; deferring discover until after think",
+      "late_discover_applied": true
+    }
+  ],
+  "usdc_paid_onchain": "0.010000",
+  "usdc_paid_succeeded": "0.010000",
+  "wasted_usdc": "0.000000"
+}

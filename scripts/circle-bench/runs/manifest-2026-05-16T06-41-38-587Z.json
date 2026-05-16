@@ -1,0 +1,18 @@
+{
+  "git_sha": "ce331a8b79e1177c650fa15f9d15ed393ecdaecf",
+  "mode": "bare",
+  "n_workflows": 1,
+  "n_hops": 2,
+  "fail_rate": 0.05,
+  "started_at": "2026-05-16T06:41:38.587Z",
+  "ended_at": "2026-05-16T06:41:42.714Z",
+  "duration_ms": 4126,
+  "summary": {
+    "e2e_success_count": 0,
+    "e2e_success_rate": 0,
+    "total_usdc_spent": "0.000000"
+  },
+  "all_tx_hashes": [
+    "0x6a98b99ddb2c2561e6af0b4ac0e490edb8e521f2a0acad49f7b0cef914a09d0a"
+  ]
+}

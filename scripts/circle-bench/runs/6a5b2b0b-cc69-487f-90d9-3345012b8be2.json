@@ -1,0 +1,75 @@
+{
+  "workflow_id": "6a5b2b0b-cc69-487f-90d9-3345012b8be2",
+  "mode": "helix",
+  "started_at": "2026-05-16T09:28:02.542Z",
+  "ended_at": "2026-05-16T09:28:39.202Z",
+  "duration_ms": 36660,
+  "e2e_success": false,
+  "hops": [
+    {
+      "hop_index": 0,
+      "outcome": "success",
+      "tx_id": "8c8c32f0-c087-5f3f-ac32-a2fa0b67d351",
+      "tx_hash": "0x6bb307916e30b7a5dd68bf189b1cd60c4398130d1dae0d903026c5931774dff4",
+      "price_usdc": "0.001",
+      "duration_ms": 10063,
+      "step_durations": {
+        "discover_ms": 76,
+        "estimate_ms": 0,
+        "pay_ms": 2857,
+        "verify_ms": 22
+      },
+      "quote_age_at_verify_ms": 2858,
+      "think_delay_ms": 7106,
+      "injected_503": false,
+      "preflight_applied": true,
+      "preflight_note": "audit has prior stale_quote; deferring discover until after think",
+      "late_discover_applied": true
+    },
+    {
+      "hop_index": 1,
+      "outcome": "success",
+      "tx_id": "f8fa250f-e138-5f47-a237-8f677228070f",
+      "tx_hash": "0xb4e6977d28d692b16d9215b409b93f9dcb88263fc2f1141ebaa073c10cdd6da2",
+      "price_usdc": "0.001",
+      "duration_ms": 9656,
+      "step_durations": {
+        "discover_ms": 87,
+        "estimate_ms": 0,
+        "pay_ms": 2996,
+        "verify_ms": 30
+      },
+      "quote_age_at_verify_ms": 2996,
+      "think_delay_ms": 6541,
+      "injected_503": false,
+      "preflight_applied": true,
+      "preflight_note": "audit has prior stale_quote; deferring discover until after think",
+      "late_discover_applied": true
+    },
+    {
+      "hop_index": 2,
+      "outcome": "failure",
+      "tx_id": "bff42a17-bd3d-52ce-8220-fbc575e1f6ec",
+      "tx_hash": "0x88adeb82469be1f6c8e1c9efec71c3f2e81cec54e85d6f211fcce1f856b88bd8",
+      "price_usdc": "0.001",
+      "failure_step": "verify",
+      "failure_reason": "verify rejected: stale_quote",
+      "duration_ms": 16934,
+      "step_durations": {
+        "discover_ms": 87,
+        "estimate_ms": 0,
+        "pay_ms": 8758,
+        "verify_ms": 84
+      },
+      "quote_age_at_verify_ms": 8758,
+      "think_delay_ms": 8004,
+      "injected_503": false,
+      "preflight_applied": true,
+      "preflight_note": "audit has prior stale_quote; deferring discover until after think",
+      "late_discover_applied": true
+    }
+  ],
+  "usdc_paid_onchain": "0.003000",
+  "usdc_paid_succeeded": "0.002000",
+  "wasted_usdc": "0.001000"
+}
