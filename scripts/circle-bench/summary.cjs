@@ -51,8 +51,10 @@ function analyze(manifestPath, mode) {
   let stale = 0,
     c503 = 0,
     success = 0,
+    infra = 0,
     other = 0,
     total = 0;
+  const infraDetails = [];
   for (const f of files) {
     try {
       const w = JSON.parse(fs.readFileSync(path.join(dir, f)));
@@ -66,12 +68,26 @@ function analyze(manifestPath, mode) {
       }
       const failed = w.hops.find((h) => h.outcome === "failure");
       if (!failed) continue;
-      if (failed.injected_503 || /503/.test(failed.failure_reason || "")) c503++;
-      else if (/stale_quote/.test(failed.failure_reason || "")) stale++;
-      else other++;
+      if (failed.injected_503 || /503/.test(failed.failure_reason || "")) {
+        c503++;
+      } else if (/stale_quote/.test(failed.failure_reason || "")) {
+        stale++;
+      } else if (
+        /ECONNRESET|ETIMEDOUT|EAI_AGAIN|socket hang up|ENOTFOUND/i.test(
+          failed.failure_reason || "",
+        )
+      ) {
+        infra++;
+        infraDetails.push({
+          workflow_id: w.workflow_id,
+          reason: failed.failure_reason,
+        });
+      } else {
+        other++;
+      }
     } catch {}
   }
-  return { manifest, stale, c503, success, other, total };
+  return { manifest, stale, c503, success, infra, infraDetails, other, total };
 }
 
 const lines = [];
@@ -99,17 +115,30 @@ for (const r of RUNS) {
   }
   const m = a.manifest;
   lines.push(
-    `  E2E success     : ${m.summary.e2e_success_count}/${m.n_workflows} (${(m.summary.e2e_success_rate * 100).toFixed(1)}%)`,
+    `  E2E success           : ${m.summary.e2e_success_count}/${m.n_workflows} (${(m.summary.e2e_success_rate * 100).toFixed(1)}%)`,
   );
-  lines.push(`  stale_quote     : ${a.stale}`);
-  lines.push(`  503 (seeded)    : ${a.c503}`);
-  lines.push(`  other failures  : ${a.other}`);
-  lines.push(`  USDC paid       : ${m.summary.usdc_paid_onchain}`);
-  lines.push(`  USDC succeeded  : ${m.summary.usdc_paid_succeeded}`);
-  lines.push(`  USDC wasted     : ${m.summary.wasted_usdc}`);
-  lines.push(`  Duration        : ${(m.duration_ms / 1000).toFixed(1)}s`);
-  lines.push(`  Tx hashes       : ${m.all_tx_hashes.length}`);
-  lines.push(`  Manifest        : ${mp}`);
+  if (a.infra > 0) {
+    const validTotal = m.n_workflows - a.infra;
+    const validRate = (m.summary.e2e_success_count / validTotal) * 100;
+    lines.push(
+      `  E2E excl infra        : ${m.summary.e2e_success_count}/${validTotal} (${validRate.toFixed(1)}%)`,
+    );
+  }
+  lines.push(`  stale_quote           : ${a.stale}`);
+  lines.push(`  503 (seeded)          : ${a.c503}`);
+  lines.push(`  infrastructure (excl) : ${a.infra}`);
+  if (a.infra > 0) {
+    for (const d of a.infraDetails) {
+      lines.push(`    - ${d.workflow_id.slice(0, 8)}: ${d.reason}`);
+    }
+  }
+  lines.push(`  other failures        : ${a.other}`);
+  lines.push(`  USDC paid             : ${m.summary.usdc_paid_onchain}`);
+  lines.push(`  USDC succeeded        : ${m.summary.usdc_paid_succeeded}`);
+  lines.push(`  USDC wasted           : ${m.summary.wasted_usdc}`);
+  lines.push(`  Duration              : ${(m.duration_ms / 1000).toFixed(1)}s`);
+  lines.push(`  Tx hashes             : ${m.all_tx_hashes.length}`);
+  lines.push(`  Manifest              : ${mp}`);
 }
 
 lines.push("");
@@ -126,13 +155,20 @@ for (const [bareId, helixId, label] of pairs) {
     lines.push(`  ${label}: pair incomplete`);
     continue;
   }
-  const eB = b.manifest.summary.e2e_success_rate * 100;
-  const eH = h.manifest.summary.e2e_success_rate * 100;
+  // Use infra-excluded rates when applicable so deltas are honest.
+  const bValid = b.manifest.n_workflows - b.infra;
+  const hValid = h.manifest.n_workflows - h.infra;
+  const eB = (b.manifest.summary.e2e_success_count / bValid) * 100;
+  const eH = (h.manifest.summary.e2e_success_count / hValid) * 100;
+  const infraNote =
+    b.infra > 0 || h.infra > 0
+      ? `   (excl infra: bare=${b.infra}, helix=${h.infra})`
+      : "";
   const deltaE = eH - eB;
   const wasteB = parseFloat(b.manifest.summary.wasted_usdc);
   const wasteH = parseFloat(h.manifest.summary.wasted_usdc);
   lines.push(
-    `  ${label}  E2E   ${eB.toFixed(1)}% → ${eH.toFixed(1)}%   Δ ${deltaE >= 0 ? "+" : ""}${deltaE.toFixed(1)}pp`,
+    `  ${label}  E2E   ${eB.toFixed(1)}% → ${eH.toFixed(1)}%   Δ ${deltaE >= 0 ? "+" : ""}${deltaE.toFixed(1)}pp${infraNote}`,
   );
   lines.push(
     `  ${label}  USDC wasted ${wasteB.toFixed(4)} → ${wasteH.toFixed(4)}   (saved ${(wasteB - wasteH).toFixed(4)})`,

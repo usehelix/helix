@@ -52,30 +52,65 @@ All four runs use identical parameters except `--mode` and `--fail-rate`:
 --n-workflows=50 --n-hops=10 --ttl-ms=5000 --think-delay-range=3000,9000
 ```
 
-| # | mode  | fail-rate | E2E success | stale_quote | 503 (seeded) | USDC paid | USDC wasted | Duration |
-|---|------|----------:|------------:|------------:|-------------:|----------:|------------:|---------:|
-| 1 | bare  | 0.05  | **0 / 50  (0.0%)** | 47 | 3 | $0.047 | **$0.047** | 460 s |
-| 2 | helix | 0.05  | **26 / 50 (52.0%)** | 2 | 21 | $0.351 | **$0.002** | 3281 s |
-| 3 | bare  | 0     | **0 / 50  (0.0%)**  | 50 | 0 | $0.050 | **$0.050** | 475 s |
-| 4 | helix | 0     | **48 / 50 (96.0%)** | 2 | 0 | $0.484 | **$0.002** | 4308 s |
+| # | mode  | fail-rate | E2E success | stale_quote | 503 (seeded) | infra | USDC paid | USDC wasted | Duration |
+|---|------|----------:|------------:|------------:|-------------:|------:|----------:|------------:|---------:|
+| 1 | bare  | 0.05  | **0 / 50  (0.0%)** | 47 | 3 | 0 | $0.047 | **$0.047** | 460 s |
+| 2 | helix | 0.05  | **26 / 50 (52.0%)** †| 2 | 21 | **1** | $0.351 | **$0.002** | 3281 s |
+| 3 | bare  | 0     | **0 / 50  (0.0%)**  | 50 | 0 | 0 | $0.050 | **$0.050** | 475 s |
+| 4 | helix | 0     | **48 / 50 (96.0%)** | 2 | 0 | 0 | $0.484 | **$0.002** | 4308 s |
+
+† Run #2 saw 1 infrastructure failure (W32, `read ECONNRESET` during Circle
+SDK `createTransaction` — TCP connection reset, not an experimental outcome).
+Excluding it: **26 / 49 = 53.1% E2E**. The infrastructure failure is reported
+here, not silently dropped.
 
 **Deltas:**
 
 | Comparison | E2E success | Wasted USDC |
 |---|---|---|
-| #2 helix − #1 bare (with 5% unpreventable 503 noise) | **+52.0 pp** | $0.045 saved (~96%) |
+| #2 helix − #1 bare (with 5% unpreventable 503 noise, excl. infra) | **+53.1 pp** | $0.045 saved (~96%) |
 | #4 helix − #3 bare (pure stale, no noise) | **+96.0 pp** | $0.048 saved (~96%) |
 
 **On-chain evidence:** 932 real Arc Testnet USDC transfers across all four runs
 (47 + 351 + 50 + 484). Every tx_hash is in `runs/manifest-*.json` →
 `all_tx_hashes`. Any tx is verifiable at https://testnet.arcscan.app/.
 
-**Reading the helix 2 stale_quotes (in #2 and #4):** these are the **cold-start
-cost** — workflow #1 of each helix run begins with an empty Gene Map, must
-encounter one stale_quote, record it to audit, and then preflight kicks in for
-every subsequent hop. The 96% prevention rate in #4 reflects the post-warmup
-behavior; the post-warmup prevention rate of *learnable* failures is 100%
-(48/48 once the audit has the first stale entry).
+### Breaking down the helix-arm `stale_quote` failures
+
+Each helix arm has 2 `stale_quote` failures. They are **not** both cold-start
+— it's exactly **1 cold-start + 1 pay-tail-latency** in each arm:
+
+| Run | workflow | hop | preflight | late_discover | pay_ms | quote_age@verify | classification |
+|---|---|---:|---|---|---:|---:|---|
+| #2 | W1  | 0 | false | false | 4010 | 11782 | **cold-start** (Gene Map empty) |
+| #2 | W47 | 0 | **true** | **true** | **5583** | 5583 | **pay-tail-latency** (see below) |
+| #4 | W1  | 0 | false | false | 3915 | 11688 | **cold-start** (Gene Map empty) |
+| #4 | W8  | 2 | **true** | **true** | **8758** | 8758 | **pay-tail-latency** (see below) |
+
+**Cold-start (W1 of each run):** the Gene Map starts empty, preflight has
+nothing to consult on the very first hop, so the agent runs in bare-equivalent
+ordering. `quote_age = think + pay + verify` (~11.7s) > TTL 5s → stale. This
+failure writes the audit entry that unlocks preflight for every subsequent
+workflow. It's the **learning cost** — necessary by design.
+
+**Pay-tail-latency (W47 in #2, W8 in #4):** preflight ran, set
+`late_discover=true`, and the agent took the correct learned ordering
+(think → discover → pay → verify). But Circle's `createTransaction` pay step
+alone returned `COMPLETE` after **5583 ms** (W47) and **8758 ms** (W8) —
+2× to 3× the timing-measurement median of 2766 ms, well above the 5s TTL.
+Even with the freshest-possible quote, `pay > TTL` means stale at verify.
+
+**Helix did everything it could:** preflight applied, late_discover applied.
+The failure is a downstream variance in on-chain settlement latency that
+preflight can't predict at the moment of decision. Current preflight design
+addresses `think + pay > TTL`; it does not address `pay alone > TTL`. This
+is a real limitation, called out explicitly in §5 below and on the deck's
+limitations slide.
+
+So the cleanest reading: of the 50 helix #4 workflows, **49 had no policy
+gap** (48 succeeded, 1 cold-start absorbed the necessary learning trial);
+1 workflow (W8) hit a Circle-side latency spike outside Helix's preflight
+reach. The 96% headline is honest about both.
 
 ---
 
@@ -138,16 +173,37 @@ This framing matters when presenting to Circle: we are not claiming Helix
 solves a problem Gateway already solves. We're claiming Helix addresses
 the corresponding agent-side residual.
 
-### 5. The cold-start cost is real
+### 5. Two distinct sources of helix-arm failure — both honestly counted
 
-In every helix run, **the first stale_quote is unavoidable**. The audit
-table starts empty; preflight has nothing to consult on the first hop of
-the first workflow; that hop fails, records the audit, and only then does
-preflight start engaging. In production this means Helix has a per-failure-
-class warmup cost of one trial per Gene Map.
+Each helix arm has 2 `stale_quote` failures (see the breakdown table in
+the Results section). They are **not** the same kind of failure:
 
-We don't smooth over this — runs/W1 (the first workflow of each helix run)
-shows the failure. Subsequent workflows show the prevention.
+**(a) Cold-start trial (1 per run, W1):** Gene Map empty, preflight has
+no prior failure to consult, the first hop runs bare-equivalent and stales.
+This is the **necessary learning cost** — one trial per failure class per
+Gene Map. In production, Gene Registry Cloud (federated learning across
+agents) is intended to amortize this cost; this experiment runs against a
+local, isolated Gene Map, so we pay it once per run.
+
+**(b) Pay-tail-latency (1 per run, W47 in #2 and W8 in #4):** preflight
+ran correctly, `late_discover=true` was applied, the agent took the
+optimal known ordering. But the on-chain `pay` step itself returned
+`COMPLETE` after 5583 ms (W47) and 8758 ms (W8) — well above the 5s TTL.
+The freshest possible quote couldn't outrun the pay step's tail latency.
+
+Helix's current preflight is designed to prevent `think + pay > TTL` by
+re-ordering the agent's decisions. It does NOT prevent `pay alone > TTL`,
+because the variance in Circle's settlement timing isn't predictable at
+the preflight decision point. This is a real limitation.
+
+This failure class is "preventable in principle" but needs either:
+  (a) a richer agent-side policy — e.g. abort if pay is taking longer
+      than the TTL budget and re-discover mid-workflow; or
+  (b) a Circle-side signal — a more observable settlement-latency
+      forecast the agent can read at quote time.
+
+Both are natural joint-benchmark items for the next phase with Circle.
+We are explicitly NOT claiming Helix's current preflight covers this case.
 
 ### 6. Single agent, single Gene Map
 

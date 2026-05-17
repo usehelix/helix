@@ -1,5 +1,6 @@
 .env
 output/
 node_modules/
+.venv/
 *.log
 # runs/ intentionally tracked — bench data is the on-chain evidence trail
