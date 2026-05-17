@@ -165,7 +165,7 @@ Helix workflows run longer because they don't stop early — they complete
 all 10 hops when bare would have died at hop 0. That's the *intended*
 behavior (more value delivered) but it does mean helix arms used more wall
 time and more on-chain USDC overall ($0.351 + $0.484 paid vs. $0.047 +
-$0.050 paid). The story is **wasted** USDC, not total spend. CEO talking
+$0.050 paid). The story is **wasted** USDC, not total spend. Talking
 point should be "Helix delivered $0.831 of real value for $0.004 of waste,
 vs $0 of value for $0.097 of waste."
 
