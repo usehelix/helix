@@ -1,0 +1,97 @@
+{
+  "experiment": "transfer",
+  "git_sha": "2fa3506d1981d17a74a01a2119bd6fe7d052d953",
+  "mode": "isolated",
+  "chain": "arc-testnet",
+  "n_agents": 8,
+  "n_hops": 10,
+  "ttl_ms": 5000,
+  "think_delay_range_ms": [
+    3000,
+    9000
+  ],
+  "fail_rate": 0,
+  "started_at": "2026-05-17T07:55:11.231Z",
+  "ended_at": "2026-05-17T07:56:30.266Z",
+  "duration_ms": 79034,
+  "summary": {
+    "success_count": 0,
+    "success_rate": 0
+  },
+  "sequence": [
+    {
+      "agent_index": 1,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 2,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 3,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 4,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 5,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 6,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 7,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 8,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    }
+  ],
+  "all_tx_hashes": [
+    "0x146483f9203f9ff0a96ba52ddbcf3e7856c1bcdbaeb222365eac88c7e960c2a1",
+    "0x2efe17af13c7c091d7be197294fd869a64853565b9d94d051ab348c9dbccbeed",
+    "0x56f04a47a1b814097231f733d8808e397fe0c22ceeb9c7207182c65980c70e9d",
+    "0x59223708e986d39835b99a90f563b3c00f5006d319000ba9bb091f38f0a43deb",
+    "0xd7669a2cd8aa3a480b17abb6718f959e4fa98ff0af1be0d4730d56db11de8999",
+    "0x0a246dbcdb96d33e7f023ce026f969819398550e7f683a3dee41d6c5e21367e7",
+    "0x2f65494d65656bcfec8b9fef1506f1db233b28eba4bd358c7eb146258ca46a81",
+    "0x7f6205937fee82172624ca90e79ac723efac0ecc0aa52ef6af2cf8614b3540aa"
+  ]
+}

@@ -1,4 +1,5 @@
 import { initiateDeveloperControlledWalletsClient } from "@circle-fin/developer-controlled-wallets";
+import { getChainConfig, type ChainConfig } from "./chain-config";
 
 function requireEnv(name: string): string {
   const v = process.env[name];
@@ -11,6 +12,17 @@ const entitySecret = requireEnv("CIRCLE_ENTITY_SECRET");
 const walletId = requireEnv("CIRCLE_WALLET_ID");
 const destinationAddress = requireEnv("CIRCLE_SECOND_WALLET_ADDRESS");
 
+// Chain configuration — defaults to arc-testnet. Override via CIRCLE_BENCH_CHAIN
+// env or programmatically via setChain() before any pay call.
+let activeChain: ChainConfig = getChainConfig(process.env.CIRCLE_BENCH_CHAIN);
+export function setChain(chain: ChainConfig): void {
+  activeChain = chain;
+  cachedPayTokenId = null; // bust the cache when chain changes
+}
+export function getActiveChain(): ChainConfig {
+  return activeChain;
+}
+
 const TERMINAL_OK = new Set(["CONFIRMED", "COMPLETE"]);
 const TERMINAL_BAD = new Set(["FAILED", "DENIED", "CANCELLED"]);
 const POLL_INTERVAL_MS = 500;
@@ -20,18 +32,20 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const client = initiateDeveloperControlledWalletsClient({ apiKey, entitySecret });
 
-let cachedUsdcTokenId: string | null = null;
+let cachedPayTokenId: string | null = null;
 
-async function getUsdcTokenId(): Promise<string> {
-  if (cachedUsdcTokenId) return cachedUsdcTokenId;
+async function getPayTokenId(): Promise<string> {
+  if (cachedPayTokenId) return cachedPayTokenId;
   const balRes = await client.getWalletTokenBalance({ id: walletId });
   const balances = balRes.data?.tokenBalances ?? [];
-  const usdc = balances.find((b) => b.token?.symbol === "USDC");
-  if (!usdc?.token?.id) {
-    throw new CircleError("USDC tokenId not found on source wallet token balances");
+  const tok = balances.find((b) => b.token?.symbol === activeChain.tokenSymbol);
+  if (!tok?.token?.id) {
+    throw new CircleError(
+      `${activeChain.tokenSymbol} tokenId not found on source wallet for chain ${activeChain.name}`,
+    );
   }
-  cachedUsdcTokenId = usdc.token.id;
-  return cachedUsdcTokenId;
+  cachedPayTokenId = tok.token.id;
+  return cachedPayTokenId;
 }
 
 export class CircleError extends Error {
@@ -52,7 +66,7 @@ export interface PayResult {
 }
 
 export async function payForService(quote: { price_usdc: string }): Promise<PayResult> {
-  const tokenId = await getUsdcTokenId();
+  const tokenId = await getPayTokenId();
 
   let txRes;
   try {

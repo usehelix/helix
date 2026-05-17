@@ -1,0 +1,43 @@
+{
+  "agent_index": 21,
+  "transfer_mode": "isolated",
+  "chain": "arc-testnet",
+  "gene_map_path": "output/transfer-isolated-21.db",
+  "e2e_success": false,
+  "hops": [
+    {
+      "hop_index": 0,
+      "outcome": "failure",
+      "tx_id": "f633a594-c262-5e95-a92b-e56103623789",
+      "tx_hash": "0xce65eef065ca94d14d1471f9081063cb27fd6ad167267296c27d6258cb25ff6b",
+      "price_usdc": "0.001",
+      "failure_step": "verify",
+      "failure_reason": "verify rejected: stale_quote",
+      "duration_ms": 8857,
+      "step_durations": {
+        "discover_ms": 72,
+        "estimate_ms": 0,
+        "pay_ms": 2173,
+        "verify_ms": 83
+      },
+      "quote_age_at_verify_ms": 8702,
+      "think_delay_ms": 6527,
+      "injected_503": false,
+      "preflight_applied": false,
+      "late_discover_applied": false
+    }
+  ],
+  "failures": [
+    {
+      "hop_index": 0,
+      "failure_step": "verify",
+      "failure_reason": "verify rejected: stale_quote"
+    }
+  ],
+  "gene_map_size_at_start": 0,
+  "preflight_hits": 0,
+  "workflow_id": "608dead2-9904-4275-9068-9fe2fac7f7db",
+  "duration_ms": 8858,
+  "started_at": "2026-05-17T09:15:05.418Z",
+  "ended_at": "2026-05-17T09:15:14.276Z"
+}

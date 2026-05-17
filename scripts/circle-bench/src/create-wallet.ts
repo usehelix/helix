@@ -6,6 +6,10 @@ import {
   initiateDeveloperControlledWalletsClient,
   registerEntitySecretCiphertext,
 } from "@circle-fin/developer-controlled-wallets";
+import { getChainConfig } from "./chain-config";
+
+// --chain defaults to arc-testnet; override via env CIRCLE_BENCH_CHAIN=<key>
+const chain = getChainConfig(process.env.CIRCLE_BENCH_CHAIN);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -70,10 +74,10 @@ async function main() {
   }
   console.log(`Wallet set id: ${walletSet.id}`);
 
-  console.log("\nCreating 2 ARC-TESTNET EOA wallets...");
+  console.log(`\nCreating 2 ${chain.blockchain} EOA wallets...`);
   const walletsRes = await client.createWallets({
     walletSetId: walletSet.id,
-    blockchains: ["ARC-TESTNET"],
+    blockchains: [chain.blockchain as any],
     count: 2,
     accountType: "EOA",
   });
@@ -94,7 +98,7 @@ async function main() {
     `CIRCLE_WALLET_ADDRESS=${w1.address}`,
     `CIRCLE_SECOND_WALLET_ID=${w2.id}`,
     `CIRCLE_SECOND_WALLET_ADDRESS=${w2.address}`,
-    `CIRCLE_WALLET_BLOCKCHAIN=ARC-TESTNET`,
+    `CIRCLE_WALLET_BLOCKCHAIN=${chain.blockchain}`,
   ]);
 
   console.log("\n=== Created ===");
@@ -104,13 +108,13 @@ async function main() {
   console.log("Wallet 2 (test recipient):");
   console.log(`  id     : ${w2.id}`);
   console.log(`  address: ${w2.address}`);
-  console.log("Blockchain: ARC-TESTNET");
+  console.log(`Blockchain: ${chain.blockchain} (${chain.name})`);
   console.log(`\nFull details: ${path.join(outputDir, "wallet-info.json")}`);
 
   console.log("\n=== Next step ===");
-  console.log("Fund wallet 1 with testnet USDC:");
+  console.log(`Fund wallet 1 with testnet ${chain.tokenSymbol}:`);
   console.log("  https://faucet.circle.com");
-  console.log("  Chain  : Arc Testnet");
+  console.log(`  Chain  : ${chain.name}`);
   console.log(`  Address: ${w1.address}`);
 }
 

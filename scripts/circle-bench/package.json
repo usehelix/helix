@@ -6,6 +6,7 @@
   "scripts": {
     "create-wallet": "tsx --env-file=.env src/create-wallet.ts",
     "test-transfer": "tsx --env-file=.env src/test-transfer.ts",
+    "bench": "tsx --env-file=.env src/run.ts",
     "bench:bare": "tsx --env-file=.env src/run.ts --mode=bare",
     "bench:helix": "tsx --env-file=.env src/run.ts --mode=helix",
     "smoke": "tsx --env-file=.env src/run.ts --mode=bare --n-workflows=1 --n-hops=2"

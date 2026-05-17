@@ -1,0 +1,475 @@
+{
+  "experiment": "transfer",
+  "git_sha": "2fa3506d1981d17a74a01a2119bd6fe7d052d953",
+  "mode": "isolated",
+  "chain": "arc-testnet",
+  "n_agents": 50,
+  "n_hops": 10,
+  "ttl_ms": 5000,
+  "think_delay_range_ms": [
+    3000,
+    9000
+  ],
+  "fail_rate": 0,
+  "started_at": "2026-05-17T09:12:03.085Z",
+  "ended_at": "2026-05-17T09:19:29.673Z",
+  "duration_ms": 446588,
+  "summary": {
+    "success_count": 0,
+    "success_rate": 0
+  },
+  "sequence": [
+    {
+      "agent_index": 1,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 2,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 3,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 4,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 5,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 6,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 7,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 8,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 9,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 10,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 11,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 12,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 13,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 14,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 15,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 16,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 17,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 18,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 19,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 20,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 21,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 22,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 23,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 24,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 25,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 26,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 27,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 28,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 29,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 30,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 31,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 32,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 33,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 34,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 35,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 36,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 37,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 38,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 39,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 40,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 41,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 42,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 43,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 44,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 45,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 46,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 47,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 48,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 49,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    },
+    {
+      "agent_index": 50,
+      "gene_map_size_at_start": 0,
+      "preflight_hits": 0,
+      "e2e_success": false,
+      "first_failure_step": "verify",
+      "first_failure_reason": "verify rejected: stale_quote"
+    }
+  ],
+  "all_tx_hashes": [
+    "0x176b0a08917ac1b87e457b744d0ad3e04e94060968c2fdf618621637317b6f66",
+    "0x0ec9ba1a94bc163246c076e126c9df9be22f929ce1741d6646e4267b6013c625",
+    "0x7d43f010664825f8860d1fc287dbd082222a0fe24640b4f2f74dad63476470d5",
+    "0xc1f668cd4c1e6166e2dccd4e4ca179441aad104142afa1b64aec7201e74fcf34",
+    "0xeaa333e8aa95dba274e216eeb65340c05e9204027ba3f0ca6b92d32ea5f57a52",
+    "0x973f6a234f28cc8f6e387b2b028425e37176a83a3e07d8abc5e7c8e2f61a8371",
+    "0x69359b548c9b5d328517ad9d0a34d475f19eb1fa6b0df9a3afc3a9aa665e0f05",
+    "0xef74c04267f6446f3c8380a419ddc3934120264f5e6c56a53fcd2e5d845e3644",
+    "0xffcddcd88e8e5415bdf2dd31f4e7116da5bf47473668652a62b855a5e1b28b9e",
+    "0x3c48f1455c47086d3595c4fc135148a683607e78942a7470740ef612418ebcf9",
+    "0x619a16b08d5e7029bd78960b207da5bf6c7eba2be9043f58258da7f0faf602dd",
+    "0x52974ed507c218aa29cefafb0731b6282cadca313e09055d5eb015d0ad1579aa",
+    "0x48b6790324957269228b590b197ca590f712f961b62960b6947c3fd254b3db3d",
+    "0xfe50845cbb4688b66b60fb45cbbfbf502f69ffeffebd4dd941e7dbb8d91c6fc7",
+    "0x82951134ddd7dc770ae014d58f29addcad0a9bc74a2b97f7839c64e6a3e12fdd",
+    "0xf7056a27e47d700f53ef9a98c33f95b1508d57089d5b23ae9ec33168f276a496",
+    "0xcafe1719bb570798f90217eb0ea9cd8537e8ae263389a2a1c37287729f1d04fe",
+    "0x2f54ba1e49fd1d8ae49006677420f9e45bb1c052c501ee282d601f76881b0995",
+    "0xd990200954bc07010b8cee8ed71b5142c115ee36d6936055eb965a3bbb8cd153",
+    "0x9ab9c90be06625db524d6462000a3dca4d549926297893a393713ab2e6e4459c",
+    "0xce65eef065ca94d14d1471f9081063cb27fd6ad167267296c27d6258cb25ff6b",
+    "0xdb9d22108b3dde752a6417f84b9cbfb1ca1d456b5eb95f63c5dbe5595c7e6c7f",
+    "0x3119fe1d7f1e3b25bb6e504a47152df3397e8a013329a129766c8ca1306f6b28",
+    "0x0b68d372a7e787598dbd1e78878ba6333d1331c96388c4e8d7c0bbadec6e679f",
+    "0xa05dd5c14ec553d747d92b17464cf51eec664ecc102e35edeb33e4bd9f518ea1",
+    "0x53bc29978b051afc3ae4e28c4fd887f502b1660a5704d32d17bb5f6633c12f79",
+    "0xb467b074fc169e1ae632a157aec457aa4629cad67c39d783edc7e9423b86701f",
+    "0xb93be5f480d0790ebef728770c3c2d2363ec7878af3ca94ebe5f143bb0bde782",
+    "0x000364e0ddb4bd228dea66885d309d8afb2f93129eb46b72e961d72900f0f80c",
+    "0x66b72560e1f728f000fc560f1088d65759f8846130b03c4f1dabee7f6b097d1d",
+    "0x8ad76d5f179e4f791d4c430844ceee6dd9d2311cdb19d4a8475e92aeb2c055f8",
+    "0x7308e2d28d68acf92ee794dde4f2c0f9a74ebf83071ae74f29e935dc8d4a1f7d",
+    "0xd7ce3ad86a2da231e4bca523327f42758542194bfce0221c094f0514946c2f6d",
+    "0x8a861c4fd40d61dd8450db96061b61e4c8697f88c7740d9215cf9f39a50070b5",
+    "0xcab31a600b3811e5a5951fdab76b09d4f6a3384be034640bee8e2773ffc6df3d",
+    "0x8425dd2358723fd277574e04354e2bad453d4753eb97e92bde729ede2f4af2c4",
+    "0x5c16a584cce993024f94f23bbb6c397b3c7d58f3ba6d297570ad9f317ef2c226",
+    "0x40f139a63c2209fe455bd07de545c112474f71f2ff91a759436b754d38ab1cee",
+    "0xd7eaed2c132e25b1abcd45fd98f0a1b8e725d83c597a3131d673aa5d032567c5",
+    "0x0a15eb497d62fa55d495281b30a58d4c4b6d9b9f452e479afb4787a1c59b8aa0",
+    "0x0f2e4aa64d2cb8475691da5ed1cf7596f62d5f6ff8a394a576dd11b0fa9ea122",
+    "0x32788b83cec490ef2bfed0f98cb9d9532483e91637c4906eadda3d893c2e9f54",
+    "0x9b995819f2708edfb637f850a4f689b0823bed05d5cfc7537a563a40c6d063d6",
+    "0x58b89a0ba33b8b8517cfeefce66c1ddbb10a7e58ecb99a393320362c9da1d8c8",
+    "0xc3a5af3f44d12ccee974127bf542b6ccaace2af486b2f97c616b2f68eee66ed6",
+    "0x334e270081a86d1843f14befa0a10a17ffdd4c1139b5985a3b2b01d594ccf348",
+    "0x5a27885c54d19ee8b39d7c4412551c68e4c9f3728ee8415ac9735f01ac90493b",
+    "0x3b913069d7f0a09e758523e8432801bcd136bedcd0737271b99d48627c2c198d",
+    "0x3d2534e06c66e13ece24034c7a6d5a21125fe25017764aec35599271ca23c027",
+    "0x25834b8116923f2adc9a261f4e6ca7a07377527697a62b70d3de05820b8fcf4d"
+  ]
+}

@@ -4,37 +4,66 @@ import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { runWorkflow, type Mode, type WorkflowResult } from "./workflow";
+import { getChainConfig, DEFAULT_CHAIN_KEY } from "./chain-config";
+import { setChain } from "./circle-client";
+import { runTransferExperiment, type TransferMode } from "./transfer";
+
+type Experiment = "scenario1" | "transfer";
 
 interface Args {
+  experiment: Experiment;
   mode: Mode;
   nWorkflows: number;
   nHops: number;
   failRate: number;
   ttlMs?: number;
   thinkDelayRange: [number, number];
+  chainKey: string;
+  // transfer-only
+  transferMode: TransferMode;
+  nAgents: number;
 }
 
 function parseArgs(argv: string[]): Args {
   const out: Args = {
+    experiment: "scenario1",
     mode: "bare",
     nWorkflows: 50,
     nHops: 10,
     failRate: 0.05,
     thinkDelayRange: [0, 0],
+    chainKey: DEFAULT_CHAIN_KEY,
+    transferMode: "shared",
+    nAgents: 50,
   };
   for (const raw of argv) {
     if (!raw.startsWith("--")) continue;
     const [k, vRaw] = raw.slice(2).split("=");
     const v = vRaw ?? "";
     switch (k) {
+      case "experiment":
+        if (v !== "scenario1" && v !== "transfer")
+          throw new Error(`invalid --experiment: ${v}`);
+        out.experiment = v;
+        break;
       case "mode":
         if (v !== "bare" && v !== "helix") throw new Error(`invalid --mode: ${v}`);
         out.mode = v;
+        break;
+      case "transfer-mode":
+        if (v !== "shared" && v !== "isolated")
+          throw new Error(`invalid --transfer-mode: ${v}`);
+        out.transferMode = v;
         break;
       case "n-workflows":
         out.nWorkflows = parseInt(v, 10);
         if (!Number.isFinite(out.nWorkflows) || out.nWorkflows < 1)
           throw new Error(`invalid --n-workflows: ${v}`);
+        break;
+      case "n-agents":
+        out.nAgents = parseInt(v, 10);
+        if (!Number.isFinite(out.nAgents) || out.nAgents < 1)
+          throw new Error(`invalid --n-agents: ${v}`);
         break;
       case "n-hops":
         out.nHops = parseInt(v, 10);
@@ -63,6 +92,9 @@ function parseArgs(argv: string[]): Args {
         out.thinkDelayRange = [parts[0], parts[1]];
         break;
       }
+      case "chain":
+        out.chainKey = v || DEFAULT_CHAIN_KEY;
+        break;
       default:
         throw new Error(`unknown arg: --${k}`);
     }
@@ -82,8 +114,25 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
+  const chain = getChainConfig(args.chainKey);
+  setChain(chain);
+
+  // Dispatch: transfer experiment runs entirely in transfer.ts.
+  if (args.experiment === "transfer") {
+    await runTransferExperiment({
+      mode: args.transferMode,
+      nAgents: args.nAgents,
+      nHops: args.nHops,
+      ttlMs: args.ttlMs,
+      thinkDelayRange: args.thinkDelayRange,
+      failRate: args.failRate,
+      chain,
+    });
+    return;
+  }
+
   console.log(
-    `mode=${args.mode} n-workflows=${args.nWorkflows} n-hops=${args.nHops} fail-rate=${args.failRate}` +
+    `experiment=${args.experiment} chain=${chain.key} mode=${args.mode} n-workflows=${args.nWorkflows} n-hops=${args.nHops} fail-rate=${args.failRate}` +
       (args.ttlMs !== undefined ? ` ttl-ms=${args.ttlMs}` : "") +
       ` think-delay=[${args.thinkDelayRange[0]},${args.thinkDelayRange[1]}]ms`,
   );

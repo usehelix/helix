@@ -3,4 +3,17 @@ output/
 node_modules/
 .venv/
 *.log
+
+# Defense-in-depth: explicit sensitive-file patterns (in case any of these
+# ever end up outside output/). These MUST NEVER enter the repo.
+wallet-info.json
+recovery_file_*.dat
+recovery_file_*.bin
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+helix-genes.db
+
 # runs/ intentionally tracked — bench data is the on-chain evidence trail
