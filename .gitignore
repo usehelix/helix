@@ -1,6 +1,10 @@
 node_modules/
 dist/
 *.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
 helix.config.json
 .env
 .DS_Store
