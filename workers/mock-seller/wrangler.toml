@@ -1,0 +1,4 @@
+name = "vialos-mock-seller"
+main = "src/index.ts"
+compatibility_date = "2026-01-01"
+account_id = "b06ea550d1bdbe3ae9968a3dbb9d03a4"
