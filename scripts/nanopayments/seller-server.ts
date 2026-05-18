@@ -23,7 +23,7 @@ if (!SELLER_ADDRESS) {
 const app = express();
 const gateway = createGatewayMiddleware({
   sellerAddress: SELLER_ADDRESS,
-  networks: ['eip155:5042002'], // Arc Testnet only
+  facilitatorUrl: 'https://gateway-api-testnet.circle.com',
 });
 
 app.get('/item', gateway.require('$0.001'), (_req, res) => {

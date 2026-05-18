@@ -41,6 +41,8 @@
     "@circle-fin/x402-batching": "^3.0.4",
     "@coinbase/cdp-sdk": "^1.46.1",
     "@coinbase/coinbase-sdk": "^0.25.0",
-    "@privy-io/node": "^0.11.0"
+    "@privy-io/node": "^0.11.0",
+    "@x402/core": "^2.12.0",
+    "@x402/evm": "^2.12.0"
   }
 }

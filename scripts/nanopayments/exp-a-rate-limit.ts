@@ -89,13 +89,15 @@ async function main() {
   console.log('Gateway available:', balances.gateway.formattedAvailable, 'USDC');
 
   const allResults: BatchResult[] = [];
-  for (const n of [5, 10, 20]) {
+  const ladder = [5, 10, 20, 50, 100];
+  for (let idx = 0; idx < ladder.length; idx++) {
+    const n = ladder[idx];
     const result = await runBatch(n, client);
     allResults.push(result);
 
-    if (n < 20) {
-      console.log('  Waiting 10s before next batch...');
-      await new Promise(r => setTimeout(r, 10000));
+    if (idx < ladder.length - 1) {
+      console.log('  Waiting 15s before next batch...');
+      await new Promise(r => setTimeout(r, 15000));
     }
   }
 
@@ -107,7 +109,8 @@ async function main() {
   if (firstFailure) {
     console.log(`\nRate limit kicks in at N=${firstFailure.n}`);
   } else {
-    console.log('\nNo rate limit detected up to N=20. Try larger N.');
+    const maxN = allResults[allResults.length - 1]?.n ?? 0;
+    console.log(`\nNo rate limit detected up to N=${maxN}. Try larger N.`);
   }
 
   fs.writeFileSync(
