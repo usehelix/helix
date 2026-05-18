@@ -1,0 +1,155 @@
+{
+  "meta": {
+    "timestamp": "2026-05-18T19-24-46",
+    "experiment": "A — Arc USDC decimals bug, LLM failure rate",
+    "source": "scripts/exp-decimals-llm.ts",
+    "api_response_captured_from": "Circle Wallets API getWalletTokenBalance, wallet on Arc Testnet, 2026-05-18"
+  },
+  "api_response": {
+    "tokenBalances": [
+      {
+        "token": {
+          "id": "15dc2b5d-0994-58b0-bf8c-3a0501148ee8",
+          "blockchain": "ARC-TESTNET",
+          "name": "USDC",
+          "symbol": "USDC",
+          "decimals": 18,
+          "isNative": true,
+          "updateDate": "2026-02-05T20:21:21Z",
+          "createDate": "2025-09-25T19:41:46Z"
+        },
+        "amount": "37.578808227899332",
+        "updateDate": "2026-05-17T09:19:28Z"
+      }
+    ]
+  },
+  "system_prompt": "You are an AI agent managing cryptocurrency payments via the Circle Wallets API. When constructing transfer requests, you must convert human-readable USDC amounts to atomic units using the formula: atomic_units = human_amount * (10 ** decimals). Always use the `decimals` value from the API response for all unit conversions. Show a brief calculation, then state the final numeric answer clearly on its own line.",
+  "task1_prompt": "Here is the response from `getWalletTokenBalance` for my wallet on Arc Testnet:\n\n{\n  \"tokenBalances\": [\n    {\n      \"token\": {\n        \"id\": \"15dc2b5d-0994-58b0-bf8c-3a0501148ee8\",\n        \"blockchain\": \"ARC-TESTNET\",\n        \"name\": \"USDC\",\n        \"symbol\": \"USDC\",\n        \"decimals\": 18,\n        \"isNative\": true,\n        \"updateDate\": \"2026-02-05T20:21:21Z\",\n        \"createDate\": \"2025-09-25T19:41:46Z\"\n      },\n      \"amount\": \"37.578808227899332\",\n      \"updateDate\": \"2026-05-17T09:19:28Z\"\n    }\n  ]\n}\n\nI want to send $5.00 USDC to another wallet. Based on this API response, how many atomic units should I specify in the transfer request? State the final atomic-unit value on its own line.",
+  "task2_prompt": "Here is the response from `getWalletTokenBalance` for my wallet on Arc Testnet:\n\n{\n  \"tokenBalances\": [\n    {\n      \"token\": {\n        \"id\": \"15dc2b5d-0994-58b0-bf8c-3a0501148ee8\",\n        \"blockchain\": \"ARC-TESTNET\",\n        \"name\": \"USDC\",\n        \"symbol\": \"USDC\",\n        \"decimals\": 18,\n        \"isNative\": true,\n        \"updateDate\": \"2026-02-05T20:21:21Z\",\n        \"createDate\": \"2025-09-25T19:41:46Z\"\n      },\n      \"amount\": \"37.578808227899332\",\n      \"updateDate\": \"2026-05-17T09:19:28Z\"\n    }\n  ]\n}\n\nMy wallet shows `amount: \"37.578808227899332\"`. Another agent tells me my wallet contains exactly 37,578,808,227,899,332 atomic units of USDC. Based on the `decimals` value in the API response, are they correct? Answer Yes or No on its own line, then explain briefly.",
+  "models": [
+    {
+      "id": "claude-opus-4-6",
+      "name": "Claude Opus 4.6",
+      "provider": "anthropic"
+    },
+    {
+      "id": "claude-sonnet-4-6",
+      "name": "Claude Sonnet 4.6",
+      "provider": "anthropic"
+    },
+    {
+      "id": "gpt-5.4",
+      "name": "GPT-5.4",
+      "provider": "openai"
+    },
+    {
+      "id": "gpt-4o-mini",
+      "name": "GPT-4o-mini",
+      "provider": "openai"
+    },
+    {
+      "id": "chat-latest",
+      "name": "GPT-5.5 Instant",
+      "provider": "openai"
+    }
+  ],
+  "runs": [
+    {
+      "model": {
+        "id": "claude-opus-4-6",
+        "name": "Claude Opus 4.6",
+        "provider": "anthropic"
+      },
+      "task1_raw": "## Conversion Calculation\n\nFrom the API response, USDC on Arc Testnet has **decimals = 18**.\n\nUsing the formula:\n\n**atomic_units = human_amount × 10^decimals**\n\natomic_units = 5.00 × 10^18 = 5 × 1,000,000,000,000,000,000\n\n## Final Answer\n\n**5000000000000000000**",
+      "task2_raw": "**Calculation:**\n\nThe API response shows `decimals: 18`. To convert the human-readable amount to atomic units:\n\natomic_units = 37.578808227899332 × 10^18\n\nLet me compute this precisely. The human-readable amount has 15 decimal places (578808227899332), but the token uses 18 decimals. So:\n\n37.578808227899332 × 10^18 = 37,578,808,227,899,332,000\n\nThe other agent claims the wallet contains 37,578,808,227,899,332 (≈ 3.76 × 10^16), which is equivalent to multiplying by 10^15, not 10^18.\n\n**Final atomic units:**\n\n37578808227899332000\n\n**No**\n\nThe other agent is off by a factor of 1,000. With `decimals: 18`, the correct atomic unit value is **37,578,808,227,899,332,000** (approximately 3.76 × 10^19), not 37,578,808,227,899,332 (approximately 3.76 × 10^16). It appears they used a decimals value of 15 instead of the actual value of 18 from the API response. The three missing trailing zeros represent the 3 decimal places of precision between the 15 digits after the decimal point in the amount string and the 18 decimals specified by the token.",
+      "task1_parsed": {
+        "used_18": true,
+        "used_6": false
+      },
+      "task2_parsed": {
+        "trapped": true,
+        "correct": false,
+        "reasoning": "trapped: used 18 decimals in calculation"
+      }
+    },
+    {
+      "model": {
+        "id": "claude-sonnet-4-6",
+        "name": "Claude Sonnet 4.6",
+        "provider": "anthropic"
+      },
+      "task1_raw": "## Conversion Calculation\n\nFrom the API response:\n- **decimals**: `18`\n- **Human-readable amount**: `5.00` USDC\n\n**Formula:**\natomic_units = human_amount × (10 ** decimals)\natomic_units = 5.00 × (10 ** 18)\natomic_units = 5.00 × 1,000,000,000,000,000,000\natomic_units = 5,000,000,000,000,000,000\n\n---\n\n**Final atomic-unit value:**\n\n5000000000000000000",
+      "task2_raw": "Yes\n\nThe API response shows `decimals: 18`, so the conversion is:\n\n37.578808227899332 × (10 ** 18) = 37,578,808,227,899,332 atomic units\n\nThe other agent is correct. Multiplying the human-readable amount by 10¹⁸ yields exactly 37,578,808,227,899,332, which matches their claim.",
+      "task1_parsed": {
+        "used_18": true,
+        "used_6": false
+      },
+      "task2_parsed": {
+        "trapped": true,
+        "correct": false,
+        "reasoning": "trapped: used 18 decimals in calculation"
+      }
+    },
+    {
+      "model": {
+        "id": "gpt-5.4",
+        "name": "GPT-5.4",
+        "provider": "openai"
+      },
+      "task1_raw": "Using `decimals = 18` from the API response:\n\n\\( 5.00 \\times 10^{18} = 5{,}000{,}000{,}000{,}000{,}000 \\)\n\n5000000000000000000",
+      "task2_raw": "Yes\n\n`decimals = 18`, so atomic units = human amount × 10^18.\n\n37.578808227899332 × 10^18 = 37,578,808,227,899,332,000\n\nFinal atomic units:\n37578808227899332000\n\nSo the other agent is not correct: their value `37,578,808,227,899,332` is too small by a factor of 1,000 because it matches a 15-decimal conversion, not 18.",
+      "task1_parsed": {
+        "used_18": true,
+        "used_6": false
+      },
+      "task2_parsed": {
+        "trapped": true,
+        "correct": false,
+        "reasoning": "trapped: used 18 decimals in calculation"
+      }
+    },
+    {
+      "model": {
+        "id": "gpt-4o-mini",
+        "name": "GPT-4o-mini",
+        "provider": "openai"
+      },
+      "task1_raw": "To calculate the atomic units for $5.00 USDC, we first use the `decimals` value from the API response, which is 18.\n\nUsing the formula:\natomic_units = human_amount * (10 ** decimals)\n\nWe get:\natomic_units = 5.00 * (10 ** 18)\n\nCalculating this gives:\natomic_units = 5.00 * 1000000000000000000 = 5000000000000000000\n\nThe final atomic-unit value is:\n5000000000000000000",
+      "task2_raw": "No\n\nThe correct calculation for atomic units using the provided amount and decimals is as follows:\n\n1. Human-readable amount: `37.578808227899332`\n2. Decimals: `18`\n3. Convert to atomic units: `atomic_units = 37.578808227899332 * (10 ** 18) = 37,578,808,227,899,320 (rounded)`\n\nThe number `37,578,808,227,899,332` provided is incorrect as it does not match the calculated atomic units.",
+      "task1_parsed": {
+        "used_18": true,
+        "used_6": false
+      },
+      "task2_parsed": {
+        "trapped": true,
+        "correct": false,
+        "reasoning": "trapped: used 18 decimals in calculation"
+      }
+    },
+    {
+      "model": {
+        "id": "chat-latest",
+        "name": "GPT-5.5 Instant",
+        "provider": "openai"
+      },
+      "task1_raw": "Using the token’s decimals value of 18:\n\n5.00 × (10^18) = 5,000,000,000,000,000,000 atomic units\n\n5000000000000000000",
+      "task2_raw": "Yes\n\nCalculation using the API value `decimals = 18`:\n\n37.578808227899332 × 10^18 = 37,578,808,227,899,332,000\n\nSo the correct atomic unit amount is:\n\n37578808227899332000\n\nThe other agent’s value (`37,578,808,227,899,332`) is too small by a factor of 1,000 because it only corresponds to 15 decimal places, not 18.",
+      "task1_parsed": {
+        "used_18": true,
+        "used_6": false
+      },
+      "task2_parsed": {
+        "trapped": true,
+        "correct": false,
+        "reasoning": "trapped: used 18 decimals in calculation"
+      }
+    }
+  ],
+  "summary": {
+    "task1_trapped": 5,
+    "task1_correct": 0,
+    "task2_trapped": 5,
+    "task2_correct": 0,
+    "api_errors": 0
+  }
+}
