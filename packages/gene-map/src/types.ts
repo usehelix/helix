@@ -2,6 +2,10 @@ export interface GeneCapsule {
   id?: number;
   failureCode: string;
   category: string;
+  /** Distinguishes which sub-API of a platform the capsule applies to,
+   *  e.g. 'wallets-api' vs 'gateway' for Circle. NULL/undefined = applies
+   *  to all layers (legacy capsules). */
+  apiLayer?: string | null;
   strategy: string;
   params: Record<string, unknown>;
   successCount: number;

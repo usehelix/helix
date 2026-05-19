@@ -14,7 +14,7 @@ export interface Migration {
   up: (db: Database.Database) => void;
 }
 
-export const CURRENT_SCHEMA_VERSION = 13;
+export const CURRENT_SCHEMA_VERSION = 14;
 
 export const migrations: Migration[] = [
   {
@@ -126,6 +126,72 @@ export const migrations: Migration[] = [
     description: 'Token cost tracking — capsules table for API proxy data capture',
     up: (db) => {
       db.exec(`CREATE TABLE IF NOT EXISTS capsules (id TEXT PRIMARY KEY, session_id TEXT, tool_name TEXT, input TEXT, output TEXT, success INTEGER DEFAULT 1, error_type TEXT, repair_strategy TEXT, duration_ms INTEGER DEFAULT 0, created_at TEXT DEFAULT (datetime('now')), task_type TEXT, token_cost_usd REAL, input_tokens INTEGER, output_tokens INTEGER, model TEXT, num_api_calls INTEGER)`);
+    },
+  },
+  {
+    version: 14,
+    // NOTE: Three parallel Gene Map implementations exist (packages/gene-map,
+    // packages/core, packages/vial-core). This change applied to gene-map + core.
+    // vial-core is vestigial (zero test coverage, one self-import). Cleanup tracked separately.
+    description: 'api_layer — split capsules by API sub-layer (Circle Wallets vs Gateway, etc.)',
+    up: (db) => {
+      // v14: add api_layer column + change unique key to (failure_code, category, api_layer).
+      // SQLite can't ALTER UNIQUE constraints, so recreate the genes table.
+      // NULL handling: UNIQUE INDEX with COALESCE so NULL api_layer rows still
+      // dedup against each other (NULL != NULL by default in SQL).
+
+      // Idempotent: skip entirely if api_layer already exists (re-runs are no-ops).
+      const existingCols = (db.pragma('table_info(genes)') as { name: string }[]).map(c => c.name);
+      if (existingCols.includes('api_layer')) return;
+
+      // Defensive against test envs that create a minimal genes table: only
+      // copy columns that actually exist in the source.
+      const copyableCols = [
+        'id', 'failure_code', 'category', 'strategy', 'params',
+        'q_value', 'success_count', 'consecutive_failures', 'avg_repair_ms',
+        'platforms', 'reasoning', 'failure_analysis', 'success_context',
+        'failure_context', 'scores', 'q_variance', 'q_count', 'last_5_rewards',
+        'last_success_at', 'last_failed_at', 'created_at', 'last_used_at',
+        'embedding', 'dream_cluster', 'is_meta_gene', 'conditions', 'anti_conditions',
+      ];
+      const selectCols = copyableCols.filter(c => existingCols.includes(c));
+      const insertCols = [...selectCols, 'api_layer'];
+
+      db.exec(`CREATE TABLE IF NOT EXISTS genes_new (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        failure_code TEXT NOT NULL,
+        category TEXT NOT NULL,
+        strategy TEXT NOT NULL,
+        params TEXT DEFAULT '{}',
+        q_value REAL DEFAULT 0.5,
+        success_count INTEGER DEFAULT 0,
+        consecutive_failures INTEGER DEFAULT 0,
+        avg_repair_ms REAL DEFAULT 0,
+        platforms TEXT DEFAULT '[]',
+        reasoning TEXT,
+        failure_analysis TEXT DEFAULT '[]',
+        success_context TEXT DEFAULT '{}',
+        failure_context TEXT DEFAULT '{}',
+        scores TEXT DEFAULT '{}',
+        q_variance REAL DEFAULT 0.25,
+        q_count INTEGER DEFAULT 0,
+        last_5_rewards TEXT DEFAULT '[]',
+        last_success_at INTEGER,
+        last_failed_at INTEGER,
+        created_at TEXT DEFAULT (datetime('now')),
+        last_used_at TEXT DEFAULT (datetime('now')),
+        embedding TEXT,
+        dream_cluster TEXT,
+        is_meta_gene INTEGER DEFAULT 0,
+        conditions TEXT DEFAULT '{}',
+        anti_conditions TEXT DEFAULT '{}',
+        api_layer TEXT DEFAULT NULL
+      )`);
+      db.exec(`INSERT INTO genes_new (${insertCols.join(',')}) SELECT ${selectCols.join(',')}, NULL FROM genes`);
+      db.exec('DROP TABLE genes');
+      db.exec('ALTER TABLE genes_new RENAME TO genes');
+      db.exec(`CREATE INDEX IF NOT EXISTS idx_genes_lookup ON genes(failure_code, category)`);
+      db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_genes_unique ON genes(failure_code, category, COALESCE(api_layer, ''))`);
     },
   },
 ];

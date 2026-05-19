@@ -26,6 +26,10 @@ export type ErrorCode =
   | 'nonce-mismatch'
   | 'paymaster-balance-low'
   | 'wallet-locked'
+  // Circle-specific (Group 1 nanopayments)
+  | 'wallets-api-rate-limit'
+  | 'gateway-rate-limit'
+  | 'gateway-nonce-used'
   | 'unknown';
 
 // ── Failure Categories ──────────────────────────────────────────
@@ -50,7 +54,7 @@ export type FailureCategory =
 
 export type Severity = 'low' | 'medium' | 'high' | 'critical';
 
-export type Platform = 'tempo' | 'privy' | 'coinbase' | 'stripe' | 'generic' | 'unknown';
+export type Platform = 'tempo' | 'privy' | 'coinbase' | 'stripe' | 'circle' | 'generic' | 'unknown';
 
 // ── Repair Context ──────────────────────────────────────────────
 
@@ -86,6 +90,9 @@ export interface FailureClassification {
   requiredAmount?: number;
   chainId?: number;
   walletAddress?: string;
+  /** API sub-layer within a platform (e.g. 'wallets-api' vs 'gateway' for Circle).
+   *  Threaded into Gene Map lookup so different strategies can serve different layers. */
+  apiLayer?: string | null;
 }
 
 /** A single step in a multi-step repair chain */
@@ -116,6 +123,10 @@ export interface GeneCapsule {
   id?: number;
   failureCode: ErrorCode;
   category: FailureCategory;
+  /** Distinguishes which sub-API of a platform the capsule applies to,
+   *  e.g. 'wallets-api' vs 'gateway' for Circle. NULL/undefined = applies
+   *  to all layers (legacy capsules). */
+  apiLayer?: string | null;
   strategy: string;
   params: Record<string, unknown>;
   successCount: number;

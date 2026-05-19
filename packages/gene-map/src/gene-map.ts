@@ -6,6 +6,7 @@ function parseRow(row: Record<string, unknown>): GeneCapsule {
     id: row.id as number,
     failureCode: row.failure_code as string,
     category: row.category as string,
+    apiLayer: (row.api_layer as string | null) ?? null,
     strategy: row.strategy as string,
     params: JSON.parse(row.params as string),
     successCount: row.success_count as number,
@@ -66,12 +67,13 @@ export function thompsonSample(qValue: number, qVariance: number): number {
 }
 
 export class GeneMap {
-  private static readonly SCHEMA_VERSION = 6;
+  private static readonly SCHEMA_VERSION = 7;
   private static readonly SDK_VERSION = '0.1.0';
   /** Capsule wire-format version sent to Gene Registry Cloud. Bump when adding fields. */
   private static readonly CAPSULE_SCHEMA_VERSION = 1;
   private db: Database.Database;
   private stmtLookup!: Database.Statement;
+  private stmtLookupNullFallback!: Database.Statement;
   private stmtUpsert!: Database.Statement;
   private stmtList!: Database.Statement;
   private stmtCount!: Database.Statement;
@@ -146,6 +148,58 @@ export class GeneMap {
         this.db.exec(`CREATE TABLE IF NOT EXISTS failed_repairs (id INTEGER PRIMARY KEY AUTOINCREMENT, failure_code TEXT NOT NULL, category TEXT NOT NULL, strategy TEXT NOT NULL, error TEXT NOT NULL, repair_error TEXT NOT NULL, context TEXT DEFAULT '{}', timestamp INTEGER NOT NULL)`);
         this.db.exec(`CREATE INDEX IF NOT EXISTS idx_failed_pattern ON failed_repairs(failure_code, strategy)`);
       },
+      6: () => {
+        // v7: add api_layer column + change unique key to (failure_code, category, api_layer).
+        // SQLite can't ALTER UNIQUE constraints, so recreate the genes table.
+        // NULL handling: UNIQUE INDEX with COALESCE so NULL api_layer rows still
+        // dedup against each other (NULL != NULL by default in SQL).
+
+        // Idempotent: skip entirely if api_layer already exists.
+        const existingCols = (this.db.pragma('table_info(genes)') as { name: string }[]).map(c => c.name);
+        if (existingCols.includes('api_layer')) return;
+
+        // Defensive against minimal-schema test envs: only copy columns that exist.
+        const copyableCols = [
+          'id', 'failure_code', 'category', 'strategy', 'params',
+          'success_count', 'avg_repair_ms', 'platforms', 'q_value',
+          'last_success_at', 'last_failed_at', 'consecutive_failures',
+          'reasoning', 'failure_analysis', 'success_context', 'failure_context',
+          'created_at', 'last_used_at', 'q_variance', 'q_count',
+          'last_5_rewards', 'scores',
+        ];
+        const selectCols = copyableCols.filter(c => existingCols.includes(c));
+        const insertCols = [...selectCols, 'api_layer'];
+
+        this.db.exec(`CREATE TABLE IF NOT EXISTS genes_new (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          failure_code TEXT NOT NULL,
+          category TEXT NOT NULL,
+          strategy TEXT NOT NULL,
+          params TEXT DEFAULT '{}',
+          success_count INTEGER DEFAULT 1,
+          avg_repair_ms REAL DEFAULT 0,
+          platforms TEXT DEFAULT '[]',
+          q_value REAL DEFAULT 0.5,
+          last_success_at INTEGER,
+          last_failed_at INTEGER,
+          consecutive_failures INTEGER DEFAULT 0,
+          reasoning TEXT,
+          failure_analysis TEXT DEFAULT '[]',
+          success_context TEXT DEFAULT '{}',
+          failure_context TEXT DEFAULT '{}',
+          created_at TEXT DEFAULT (datetime('now')),
+          last_used_at TEXT DEFAULT (datetime('now')),
+          q_variance REAL DEFAULT 0.25,
+          q_count INTEGER DEFAULT 0,
+          last_5_rewards TEXT DEFAULT '[]',
+          scores TEXT DEFAULT '{}',
+          api_layer TEXT DEFAULT NULL
+        )`);
+        this.db.exec(`INSERT INTO genes_new (${insertCols.join(',')}) SELECT ${selectCols.join(',')}, NULL FROM genes`);
+        this.db.exec('DROP TABLE genes');
+        this.db.exec('ALTER TABLE genes_new RENAME TO genes');
+        this.db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_genes_unique ON genes(failure_code, category, COALESCE(api_layer, ''))`);
+      },
     };
     this.db.transaction(() => {
       for (let v = from; v < GeneMap.SCHEMA_VERSION; v++) {
@@ -156,8 +210,13 @@ export class GeneMap {
   }
 
   private prepareStatements(): void {
-    this.stmtLookup = this.db.prepare(`SELECT * FROM genes WHERE failure_code = ? AND category = ? ORDER BY q_value DESC LIMIT 1`);
-    this.stmtUpsert = this.db.prepare(`INSERT INTO genes (failure_code, category, strategy, params, success_count, avg_repair_ms, platforms, q_value, consecutive_failures) VALUES (@failureCode, @category, @strategy, @params, @successCount, @avgRepairMs, @platforms, @qValue, @consecutiveFailures) ON CONFLICT(failure_code, category) DO UPDATE SET strategy = @strategy, params = @params, success_count = success_count + 1, avg_repair_ms = (avg_repair_ms * success_count + @avgRepairMs) / (success_count + 1), platforms = @platforms, q_value = @qValue, consecutive_failures = @consecutiveFailures, last_used_at = datetime('now')`);
+    // Lookup: exact api_layer match (incl. both-NULL case). Two `?` placeholders
+    // for api_layer because SQLite's `=` doesn't match NULL; need explicit IS NULL.
+    this.stmtLookup = this.db.prepare(`SELECT * FROM genes WHERE failure_code = ? AND category = ? AND (api_layer = ? OR (? IS NULL AND api_layer IS NULL)) ORDER BY q_value DESC LIMIT 1`);
+    // Fallback: legacy NULL-api_layer row, when caller specified a layer that has no exact match.
+    this.stmtLookupNullFallback = this.db.prepare(`SELECT * FROM genes WHERE failure_code = ? AND category = ? AND api_layer IS NULL ORDER BY q_value DESC LIMIT 1`);
+    // Upsert: conflict target uses the same COALESCE expression as the UNIQUE INDEX.
+    this.stmtUpsert = this.db.prepare(`INSERT INTO genes (failure_code, category, strategy, params, success_count, avg_repair_ms, platforms, q_value, consecutive_failures, api_layer) VALUES (@failureCode, @category, @strategy, @params, @successCount, @avgRepairMs, @platforms, @qValue, @consecutiveFailures, @apiLayer) ON CONFLICT(failure_code, category, COALESCE(api_layer, '')) DO UPDATE SET strategy = @strategy, params = @params, success_count = success_count + 1, avg_repair_ms = (avg_repair_ms * success_count + @avgRepairMs) / (success_count + 1), platforms = @platforms, q_value = @qValue, consecutive_failures = @consecutiveFailures, last_used_at = datetime('now')`);
     this.stmtList = this.db.prepare(`SELECT * FROM genes ORDER BY q_value DESC, success_count DESC`);
     this.stmtCount = this.db.prepare(`SELECT COUNT(*) as count FROM genes`);
     this.stmtUpdatePlatforms = this.db.prepare(`UPDATE genes SET platforms = ?, last_used_at = datetime('now') WHERE failure_code = ? AND category = ?`);
@@ -165,33 +224,59 @@ export class GeneMap {
 
   // ── L1 Cache ──
 
-  private cacheKey(code: string, category: string): string { return `${code}:${category}`; }
-  private warmCache(): void { this.cache.clear(); for (const r of this.db.prepare('SELECT * FROM genes').all() as Record<string, unknown>[]) this.cache.set(this.cacheKey(r.failure_code as string, r.category as string), r); this.cacheLoadedAt = Date.now(); }
+  private cacheKey(code: string, category: string, apiLayer?: string | null): string {
+    // Omit suffix when apiLayer is null/undefined to preserve legacy key format.
+    if (apiLayer == null) return `${code}:${category}`;
+    return `${code}:${category}:${apiLayer}`;
+  }
+  private warmCache(): void { this.cache.clear(); for (const r of this.db.prepare('SELECT * FROM genes').all() as Record<string, unknown>[]) this.cache.set(this.cacheKey(r.failure_code as string, r.category as string, (r.api_layer as string | null) ?? null), r); this.cacheLoadedAt = Date.now(); }
   private isCacheStale(): boolean { return Date.now() - this.cacheLoadedAt > this.CACHE_TTL_MS; }
 
   // ── Core CRUD ──
 
   upsertGene(gene: GeneCapsule): void {
-    this.stmtUpsert.run({ failureCode: gene.failureCode, category: gene.category, strategy: gene.strategy, params: JSON.stringify(gene.params, (_k, v) => typeof v === 'bigint' ? v.toString() : v), successCount: gene.successCount, avgRepairMs: gene.avgRepairMs, platforms: JSON.stringify(gene.platforms), qValue: gene.qValue ?? 0.5, consecutiveFailures: gene.consecutiveFailures ?? 0 });
-    this.cache.delete(this.cacheKey(gene.failureCode, gene.category));
+    this.stmtUpsert.run({ failureCode: gene.failureCode, category: gene.category, apiLayer: gene.apiLayer ?? null, strategy: gene.strategy, params: JSON.stringify(gene.params, (_k, v) => typeof v === 'bigint' ? v.toString() : v), successCount: gene.successCount, avgRepairMs: gene.avgRepairMs, platforms: JSON.stringify(gene.platforms), qValue: gene.qValue ?? 0.5, consecutiveFailures: gene.consecutiveFailures ?? 0 });
+    this.cache.delete(this.cacheKey(gene.failureCode, gene.category, gene.apiLayer));
   }
 
-  findBest(code: string, category: string): GeneCapsule | null {
-    const key = this.cacheKey(code, category);
+  findBest(code: string, category: string, apiLayer?: string | null): GeneCapsule | null {
+    const layer: string | null = apiLayer ?? null;
+    const key = this.cacheKey(code, category, layer);
     if (!this.isCacheStale() && this.cache.has(key)) {
       const cached = this.cache.get(key)!;
-      this.db.prepare(`UPDATE genes SET last_used_at = datetime('now'), success_count = success_count + 1 WHERE failure_code = ? AND category = ?`).run(code, category);
+      // Update by id so we don't mass-update sibling api_layer rows.
+      this.db.prepare(`UPDATE genes SET last_used_at = datetime('now'), success_count = success_count + 1 WHERE id = ?`).run(cached.id as number);
       const gene = parseRow(cached); gene.successCount += 1;
       return gene;
     }
-    const row = this.stmtLookup.get(code, category) as Record<string, unknown> | undefined;
+    // 1. Exact api_layer match (NULL matches NULL via the dual-placeholder predicate).
+    let row = this.stmtLookup.get(code, category, layer, layer) as Record<string, unknown> | undefined;
+    // 2. Fallback: caller specified a layer but no exact match → use the NULL/legacy row.
+    if (!row && layer !== null) {
+      row = this.stmtLookupNullFallback.get(code, category) as Record<string, unknown> | undefined;
+    }
     if (!row) return null;
-    this.db.prepare(`UPDATE genes SET last_used_at = datetime('now'), success_count = success_count + 1 WHERE failure_code = ? AND category = ?`).run(code, category);
+    this.db.prepare(`UPDATE genes SET last_used_at = datetime('now'), success_count = success_count + 1 WHERE id = ?`).run(row.id as number);
     this.cache.set(key, row);
+    // If fallback path was used, also cache under the NULL key for subsequent NULL lookups.
+    if (layer !== null && (row.api_layer ?? null) === null) {
+      this.cache.set(this.cacheKey(code, category, null), row);
+    }
     const gene = parseRow(row); gene.successCount += 1;
     return gene;
   }
 
+  // TODO(api_layer): thread apiLayer through the following methods. They currently
+  // key on (failure_code, category) only — without api_layer awareness they will
+  // mass-update/match across all api_layer variants for the same code+category.
+  //   - addPlatform
+  //   - updateQValue
+  //   - updateScores
+  //   - updateReasoning
+  //   - recordFailureAnalysis
+  //   - combine()
+  // Safe to defer until callers actually pass differentiated api_layer values
+  // (currently only Circle Group 1 capsules).
   addPlatform(code: string, category: string, platform: string): void {
     const row = this.stmtLookup.get(code, category) as Record<string, unknown> | undefined;
     if (!row) return;
