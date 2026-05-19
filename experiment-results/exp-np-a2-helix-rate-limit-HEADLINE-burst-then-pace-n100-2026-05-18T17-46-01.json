@@ -1,0 +1,1123 @@
+{
+  "bare": {
+    "mode": "bare",
+    "n": 100,
+    "successes": 23,
+    "results": [
+      {
+        "i": 0,
+        "success": true,
+        "latencyMs": 458
+      },
+      {
+        "i": 1,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 282
+      },
+      {
+        "i": 2,
+        "success": true,
+        "latencyMs": 370
+      },
+      {
+        "i": 3,
+        "success": true,
+        "latencyMs": 352
+      },
+      {
+        "i": 4,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 283
+      },
+      {
+        "i": 5,
+        "success": true,
+        "latencyMs": 375
+      },
+      {
+        "i": 6,
+        "success": true,
+        "latencyMs": 458
+      },
+      {
+        "i": 7,
+        "success": true,
+        "latencyMs": 550
+      },
+      {
+        "i": 8,
+        "success": true,
+        "latencyMs": 550
+      },
+      {
+        "i": 9,
+        "success": true,
+        "latencyMs": 452
+      },
+      {
+        "i": 10,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 270
+      },
+      {
+        "i": 11,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 283
+      },
+      {
+        "i": 12,
+        "success": true,
+        "latencyMs": 370
+      },
+      {
+        "i": 13,
+        "success": true,
+        "latencyMs": 399
+      },
+      {
+        "i": 14,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 281
+      },
+      {
+        "i": 15,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 303
+      },
+      {
+        "i": 16,
+        "success": true,
+        "latencyMs": 541
+      },
+      {
+        "i": 17,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 280
+      },
+      {
+        "i": 18,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 292
+      },
+      {
+        "i": 19,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 260
+      },
+      {
+        "i": 20,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 286
+      },
+      {
+        "i": 21,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 265
+      },
+      {
+        "i": 22,
+        "success": true,
+        "latencyMs": 458
+      },
+      {
+        "i": 23,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 385
+      },
+      {
+        "i": 24,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 292
+      },
+      {
+        "i": 25,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 320
+      },
+      {
+        "i": 26,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 282
+      },
+      {
+        "i": 27,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 369
+      },
+      {
+        "i": 28,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 267
+      },
+      {
+        "i": 29,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 261
+      },
+      {
+        "i": 30,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 278
+      },
+      {
+        "i": 31,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 281
+      },
+      {
+        "i": 32,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 286
+      },
+      {
+        "i": 33,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 256
+      },
+      {
+        "i": 34,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 293
+      },
+      {
+        "i": 35,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 335
+      },
+      {
+        "i": 36,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 260
+      },
+      {
+        "i": 37,
+        "success": true,
+        "latencyMs": 451
+      },
+      {
+        "i": 38,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 255
+      },
+      {
+        "i": 39,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 255
+      },
+      {
+        "i": 40,
+        "success": true,
+        "latencyMs": 499
+      },
+      {
+        "i": 41,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 285
+      },
+      {
+        "i": 42,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 278
+      },
+      {
+        "i": 43,
+        "success": true,
+        "latencyMs": 542
+      },
+      {
+        "i": 44,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 260
+      },
+      {
+        "i": 45,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 297
+      },
+      {
+        "i": 46,
+        "success": true,
+        "latencyMs": 400
+      },
+      {
+        "i": 47,
+        "success": true,
+        "latencyMs": 458
+      },
+      {
+        "i": 48,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 369
+      },
+      {
+        "i": 49,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 278
+      },
+      {
+        "i": 50,
+        "success": true,
+        "latencyMs": 542
+      },
+      {
+        "i": 51,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 278
+      },
+      {
+        "i": 52,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 280
+      },
+      {
+        "i": 53,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 279
+      },
+      {
+        "i": 54,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 266
+      },
+      {
+        "i": 55,
+        "success": true,
+        "latencyMs": 471
+      },
+      {
+        "i": 56,
+        "success": true,
+        "latencyMs": 488
+      },
+      {
+        "i": 57,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 279
+      },
+      {
+        "i": 58,
+        "success": true,
+        "latencyMs": 480
+      },
+      {
+        "i": 59,
+        "success": true,
+        "latencyMs": 568
+      },
+      {
+        "i": 60,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 277
+      },
+      {
+        "i": 61,
+        "success": true,
+        "latencyMs": 463
+      },
+      {
+        "i": 62,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 260
+      },
+      {
+        "i": 63,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 277
+      },
+      {
+        "i": 64,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 286
+      },
+      {
+        "i": 65,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 292
+      },
+      {
+        "i": 66,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 283
+      },
+      {
+        "i": 67,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 286
+      },
+      {
+        "i": 68,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 303
+      },
+      {
+        "i": 69,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 270
+      },
+      {
+        "i": 70,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 292
+      },
+      {
+        "i": 71,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 267
+      },
+      {
+        "i": 72,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 295
+      },
+      {
+        "i": 73,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 303
+      },
+      {
+        "i": 74,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 352
+      },
+      {
+        "i": 75,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 612
+      },
+      {
+        "i": 76,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 303
+      },
+      {
+        "i": 77,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 324
+      },
+      {
+        "i": 78,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 303
+      },
+      {
+        "i": 79,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 317
+      },
+      {
+        "i": 80,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 303
+      },
+      {
+        "i": 81,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 279
+      },
+      {
+        "i": 82,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 305
+      },
+      {
+        "i": 83,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 291
+      },
+      {
+        "i": 84,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 305
+      },
+      {
+        "i": 85,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 267
+      },
+      {
+        "i": 86,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 280
+      },
+      {
+        "i": 87,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 308
+      },
+      {
+        "i": 88,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 287
+      },
+      {
+        "i": 89,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 320
+      },
+      {
+        "i": 90,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 281
+      },
+      {
+        "i": 91,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 279
+      },
+      {
+        "i": 92,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 282
+      },
+      {
+        "i": 93,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 303
+      },
+      {
+        "i": 94,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 286
+      },
+      {
+        "i": 95,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 286
+      },
+      {
+        "i": 96,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 277
+      },
+      {
+        "i": 97,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 317
+      },
+      {
+        "i": 98,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 281
+      },
+      {
+        "i": 99,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 314
+      }
+    ]
+  },
+  "helix": {
+    "mode": "helix_burst_then_pace",
+    "n": 100,
+    "successes": 70,
+    "results": [
+      {
+        "i": 0,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 95
+      },
+      {
+        "i": 1,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 86
+      },
+      {
+        "i": 2,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 96
+      },
+      {
+        "i": 3,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 109
+      },
+      {
+        "i": 4,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 89
+      },
+      {
+        "i": 5,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 85
+      },
+      {
+        "i": 6,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 90
+      },
+      {
+        "i": 7,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 78
+      },
+      {
+        "i": 8,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 116
+      },
+      {
+        "i": 9,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 88
+      },
+      {
+        "i": 10,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 122
+      },
+      {
+        "i": 11,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 120
+      },
+      {
+        "i": 12,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 119
+      },
+      {
+        "i": 13,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 115
+      },
+      {
+        "i": 14,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 92
+      },
+      {
+        "i": 15,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 116
+      },
+      {
+        "i": 16,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 119
+      },
+      {
+        "i": 17,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 118
+      },
+      {
+        "i": 18,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 99
+      },
+      {
+        "i": 19,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 116
+      },
+      {
+        "i": 20,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 146
+      },
+      {
+        "i": 21,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 144
+      },
+      {
+        "i": 22,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 114
+      },
+      {
+        "i": 23,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 100
+      },
+      {
+        "i": 24,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 100
+      },
+      {
+        "i": 25,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 145
+      },
+      {
+        "i": 26,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 146
+      },
+      {
+        "i": 27,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 114
+      },
+      {
+        "i": 28,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 143
+      },
+      {
+        "i": 29,
+        "success": false,
+        "error": "Payment failed: Payment processing error",
+        "latencyMs": 144
+      },
+      {
+        "i": 30,
+        "success": true,
+        "latencyMs": 423
+      },
+      {
+        "i": 31,
+        "success": true,
+        "latencyMs": 382
+      },
+      {
+        "i": 32,
+        "success": true,
+        "latencyMs": 358
+      },
+      {
+        "i": 33,
+        "success": true,
+        "latencyMs": 421
+      },
+      {
+        "i": 34,
+        "success": true,
+        "latencyMs": 376
+      },
+      {
+        "i": 35,
+        "success": true,
+        "latencyMs": 429
+      },
+      {
+        "i": 36,
+        "success": true,
+        "latencyMs": 434
+      },
+      {
+        "i": 37,
+        "success": true,
+        "latencyMs": 412
+      },
+      {
+        "i": 38,
+        "success": true,
+        "latencyMs": 401
+      },
+      {
+        "i": 39,
+        "success": true,
+        "latencyMs": 393
+      },
+      {
+        "i": 40,
+        "success": true,
+        "latencyMs": 365
+      },
+      {
+        "i": 41,
+        "success": true,
+        "latencyMs": 408
+      },
+      {
+        "i": 42,
+        "success": true,
+        "latencyMs": 426
+      },
+      {
+        "i": 43,
+        "success": true,
+        "latencyMs": 380
+      },
+      {
+        "i": 44,
+        "success": true,
+        "latencyMs": 433
+      },
+      {
+        "i": 45,
+        "success": true,
+        "latencyMs": 408
+      },
+      {
+        "i": 46,
+        "success": true,
+        "latencyMs": 382
+      },
+      {
+        "i": 47,
+        "success": true,
+        "latencyMs": 355
+      },
+      {
+        "i": 48,
+        "success": true,
+        "latencyMs": 423
+      },
+      {
+        "i": 49,
+        "success": true,
+        "latencyMs": 406
+      },
+      {
+        "i": 50,
+        "success": true,
+        "latencyMs": 492
+      },
+      {
+        "i": 51,
+        "success": true,
+        "latencyMs": 392
+      },
+      {
+        "i": 52,
+        "success": true,
+        "latencyMs": 371
+      },
+      {
+        "i": 53,
+        "success": true,
+        "latencyMs": 492
+      },
+      {
+        "i": 54,
+        "success": true,
+        "latencyMs": 370
+      },
+      {
+        "i": 55,
+        "success": true,
+        "latencyMs": 491
+      },
+      {
+        "i": 56,
+        "success": true,
+        "latencyMs": 404
+      },
+      {
+        "i": 57,
+        "success": true,
+        "latencyMs": 378
+      },
+      {
+        "i": 58,
+        "success": true,
+        "latencyMs": 490
+      },
+      {
+        "i": 59,
+        "success": true,
+        "latencyMs": 394
+      },
+      {
+        "i": 60,
+        "success": true,
+        "latencyMs": 445
+      },
+      {
+        "i": 61,
+        "success": true,
+        "latencyMs": 442
+      },
+      {
+        "i": 62,
+        "success": true,
+        "latencyMs": 462
+      },
+      {
+        "i": 63,
+        "success": true,
+        "latencyMs": 387
+      },
+      {
+        "i": 64,
+        "success": true,
+        "latencyMs": 359
+      },
+      {
+        "i": 65,
+        "success": true,
+        "latencyMs": 377
+      },
+      {
+        "i": 66,
+        "success": true,
+        "latencyMs": 442
+      },
+      {
+        "i": 67,
+        "success": true,
+        "latencyMs": 367
+      },
+      {
+        "i": 68,
+        "success": true,
+        "latencyMs": 452
+      },
+      {
+        "i": 69,
+        "success": true,
+        "latencyMs": 348
+      },
+      {
+        "i": 70,
+        "success": true,
+        "latencyMs": 366
+      },
+      {
+        "i": 71,
+        "success": true,
+        "latencyMs": 389
+      },
+      {
+        "i": 72,
+        "success": true,
+        "latencyMs": 334
+      },
+      {
+        "i": 73,
+        "success": true,
+        "latencyMs": 336
+      },
+      {
+        "i": 74,
+        "success": true,
+        "latencyMs": 367
+      },
+      {
+        "i": 75,
+        "success": true,
+        "latencyMs": 404
+      },
+      {
+        "i": 76,
+        "success": true,
+        "latencyMs": 398
+      },
+      {
+        "i": 77,
+        "success": true,
+        "latencyMs": 347
+      },
+      {
+        "i": 78,
+        "success": true,
+        "latencyMs": 378
+      },
+      {
+        "i": 79,
+        "success": true,
+        "latencyMs": 431
+      },
+      {
+        "i": 80,
+        "success": true,
+        "latencyMs": 418
+      },
+      {
+        "i": 81,
+        "success": true,
+        "latencyMs": 349
+      },
+      {
+        "i": 82,
+        "success": true,
+        "latencyMs": 370
+      },
+      {
+        "i": 83,
+        "success": true,
+        "latencyMs": 396
+      },
+      {
+        "i": 84,
+        "success": true,
+        "latencyMs": 431
+      },
+      {
+        "i": 85,
+        "success": true,
+        "latencyMs": 359
+      },
+      {
+        "i": 86,
+        "success": true,
+        "latencyMs": 403
+      },
+      {
+        "i": 87,
+        "success": true,
+        "latencyMs": 386
+      },
+      {
+        "i": 88,
+        "success": true,
+        "latencyMs": 369
+      },
+      {
+        "i": 89,
+        "success": true,
+        "latencyMs": 414
+      },
+      {
+        "i": 90,
+        "success": true,
+        "latencyMs": 434
+      },
+      {
+        "i": 91,
+        "success": true,
+        "latencyMs": 401
+      },
+      {
+        "i": 92,
+        "success": true,
+        "latencyMs": 416
+      },
+      {
+        "i": 93,
+        "success": true,
+        "latencyMs": 347
+      },
+      {
+        "i": 94,
+        "success": true,
+        "latencyMs": 374
+      },
+      {
+        "i": 95,
+        "success": true,
+        "latencyMs": 364
+      },
+      {
+        "i": 96,
+        "success": true,
+        "latencyMs": 359
+      },
+      {
+        "i": 97,
+        "success": true,
+        "latencyMs": 376
+      },
+      {
+        "i": 98,
+        "success": true,
+        "latencyMs": 408
+      },
+      {
+        "i": 99,
+        "success": true,
+        "latencyMs": 390
+      }
+    ]
+  }
+}
