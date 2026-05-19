@@ -1,0 +1,60 @@
+{
+  "analysis": {
+    "windowDays": 7.001157407407407,
+    "capturedSignature": "eyJ4NDAyVmVyc2lvbiI6MiwicGF5bG9hZCI6eyJhdXRob3JpemF0aW9uIjp7ImZyb20iOiIweDRjRDY5NDUyMjdFNjdkN0ZFNTI5MUQ0NzdhNDI5ZkM0MGUwMjM0NDAiLCJ0byI6IjB4MUI3OWZFNDIwYTIxMWY1NUY4OEI0NkFkNTgzOTA1NzJDMTQ3M0EzMyIsInZhbHVlIjoiMTAwMCIsInZhbGlkQWZ0ZXIiOiIxNzc5MTQ3NTE5IiwidmFsaWRCZWZvcmUiOiIxNzc5NzUzMDE5Iiwibm9uY2UiOiIweDI4NGQzM2NkZGFlODNiNTk5NThlOWVkYjY4NTRlODlmYTQ5OTQ3MDNjMjNlNDFiOTA5N2FlODhhMWJhYjY0NTQifSwic2lnbmF0dXJlIjoiMHg3OWNkMjJiNTE4YWU4ZjM3MTljMDFjZjRkN2NkN2FlMjMyMTEwNmU5OGZlNjM5ZDAzYjE5ZTA5MmJkNjcwN2QzNzdkM2U3NjkyYTNjM2ViODk0ZGEwZjM4YjczZTVkM2Y3MTYwYmM4NTM3ZWI4MDkyMmYxMDhjYTJkNzE5MTI1MDFjIn0sInJlc291cmNlIjp7InVybCI6Ii9pdGVtIiwiZGVzY3JpcHRpb24iOiJQYWlkIHJlc291cmNlIiwibWltZVR5cGUiOiJhcHBsaWNhdGlvbi9qc29uIn0sImFjY2VwdGVkIjp7InNjaGVtZSI6ImV4YWN0IiwibmV0d29yayI6ImVpcDE1NTo1MDQyMDAyIiwiYXNzZXQiOiIweDM2MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAiLCJhbW91bnQiOiIxMDAwIiwicGF5VG8iOiIweDFCNzlmRTQyMGEyMTFmNTVGODhCNDZBZDU4MzkwNTcyQzE0NzNBMzMiLCJtYXhUaW1lb3V0U2Vjb25kcyI6NjA0OTAwLCJleHRyYSI6eyJuYW1lIjoiR2F0ZXdheVdhbGxldEJhdGNoZWQiLCJ2ZXJzaW9uIjoiMSIsInZlcmlmeWluZ0NvbnRyYWN0IjoiMHgwMDc3Nzc3ZDdlYmE0Njg4YmRlZjNlMzExYjg0NmYyNTg3MGExOWI5In19fQ==",
+    "capturedSignaturePrefix": "eyJ4NDAyVmVyc2lvbiI6MiwicGF5bG",
+    "decoded": {
+      "validBefore": 1779753019,
+      "validAfter": 1779147519,
+      "windowDays": 7.001157407407407,
+      "raw": {
+        "x402Version": 2,
+        "payload": {
+          "authorization": {
+            "from": "0x4cD6945227E67d7FE5291D477a429fC40e023440",
+            "to": "0x1B79fE420a211f55F88B46Ad58390572C1473A33",
+            "value": "1000",
+            "validAfter": "1779147519",
+            "validBefore": "1779753019",
+            "nonce": "0x284d33cddae83b59958e9edb6854e89fa4994703c23e41b9097ae88a1bab6454"
+          },
+          "signature": "0x79cd22b518ae8f3719c01cf4d7cd7ae2321106e98fe639d03b19e092bd6707d377d3e7692a3c3eb894da0f38b73e5d3f7160bc8537eb80922f108ca2d71912501c"
+        },
+        "resource": {
+          "url": "/item",
+          "description": "Paid resource",
+          "mimeType": "application/json"
+        },
+        "accepted": {
+          "scheme": "exact",
+          "network": "eip155:5042002",
+          "asset": "0x3600000000000000000000000000000000000000",
+          "amount": "1000",
+          "payTo": "0x1B79fE420a211f55F88B46Ad58390572C1473A33",
+          "maxTimeoutSeconds": 604900,
+          "extra": {
+            "name": "GatewayWalletBatched",
+            "version": "1",
+            "verifyingContract": "0x0077777d7eba4688bdef3e311b846f25870a19b9"
+          }
+        }
+      }
+    }
+  },
+  "capsule": {
+    "failure_code": "x402-long-validity-window",
+    "strategy": "log_warning_and_minimize_exposure",
+    "q_value": 0.85,
+    "platform": "circle-gateway",
+    "category": "security",
+    "params": {
+      "validity_window_days": 7.001157407407407,
+      "risk_level": "HIGH",
+      "mitigations": [
+        "never_log_payment_signature_header",
+        "set_valid_before_to_minimum",
+        "rotate_buyer_keys_weekly"
+      ]
+    }
+  }
+}

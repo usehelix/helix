@@ -30,19 +30,21 @@ interface DecodedAuth {
   validBefore: number;
   validAfter: number;
   windowDays: number;
+  raw?: unknown;
 }
 
 function decodePaymentSignature(sig: string): DecodedAuth {
   try {
     const decoded = Buffer.from(sig, 'base64').toString('utf8');
     const data = JSON.parse(decoded);
-    const validBefore = parseInt(data.validBefore ?? data?.value?.validBefore ?? '0');
-    const validAfter = parseInt(data.validAfter ?? data?.value?.validAfter ?? '0');
+    const auth = data?.payload?.authorization ?? data?.payload ?? data;
+    const validBefore = parseInt(auth?.validBefore ?? '0');
+    const validAfter = parseInt(auth?.validAfter ?? '0');
     const now = Math.floor(Date.now() / 1000);
     const windowDays = (validBefore - now) / 86400;
-    return { validBefore, validAfter, windowDays };
-  } catch {
-    return { validBefore: 0, validAfter: 0, windowDays: -1 };
+    return { validBefore, validAfter, windowDays, raw: data };
+  } catch (err) {
+    return { validBefore: 0, validAfter: 0, windowDays: -1, raw: { error: String(err) } };
   }
 }
 
@@ -125,6 +127,7 @@ async function main() {
     JSON.stringify({
       analysis: {
         windowDays,
+        capturedSignature: capturedSignature ?? null,
         capturedSignaturePrefix: capturedSignature ? String(capturedSignature).slice(0, 30) : null,
         decoded,
       },

@@ -1,0 +1,18 @@
+{
+  "bareResult": {
+    "sigExposed": true
+  },
+  "helixResult": {
+    "sigExposed": false
+  },
+  "log": [
+    "[2026-05-19T00:55:15.772Z] [BARE] HTTP Request to: http://localhost:4021/item",
+    "[2026-05-19T00:55:15.772Z] [BARE] Headers: {\"Content-Type\":\"application/json\"}",
+    "[2026-05-19T00:55:15.790Z] [BARE] HTTP Request to: http://localhost:4021/item",
+    "[2026-05-19T00:55:15.790Z] [BARE] Headers: {\"Content-Type\":\"application/json\",\"Payment-Signature\":\"eyJ4NDAyVmVyc2lvbiI6MiwicGF5bG9hZCI6eyJhdXRob3JpemF0aW9uIjp7ImZyb20iOiIweDRjRDY5NDUyMjdFNjdkN0ZFNTI5MUQ0NzdhNDI5ZkM0MGUwMjM0NDAiLCJ0byI6IjB4MUI3OWZFNDIwYTIxMWY1NUY4OEI0NkFkNTgzOTA1NzJDMTQ3M0EzMyIsInZhbHVlIjoiMTAwMCIsInZhbGlkQWZ0ZXIiOiIxNzc5MTUxNTE1IiwidmFsaWRCZWZvcmUiOiIxNzc5NzU3MDE1Iiwibm9uY2UiOiIweDJkNDVlZjE4NjU1NWFmOTk3YTczODNlYTA2ODNhNjA0OThhNzAwNGNjMWM0Yjc4ZGJlOGZjZGQ4ZTMyNzZlZTIifSwic2lnbmF0dXJlIjoiMHgwMmU4MzkwMWY1NjYzOTAwNTkwMjAwZDc3ZDc1NTEwOTg2YTg2NGI0N2RkNmQ2NmQ5ODliZTVhOTA4ZDBmNDIyMzkyMmRlZTNmNDgzMTFiNDkyNTdjN2M4ZjRjMjFiMjM2OTUxMWIwMmI0ZTZjZjcyM2NiNTkzMGFiNmMwODA1NjFiIn0sInJlc291cmNlIjp7InVybCI6Ii9pdGVtIiwiZGVzY3JpcHRpb24iOiJQYWlkIHJlc291cmNlIiwibWltZVR5cGUiOiJhcHBsaWNhdGlvbi9qc29uIn0sImFjY2VwdGVkIjp7InNjaGVtZSI6ImV4YWN0IiwibmV0d29yayI6ImVpcDE1NTo1MDQyMDAyIiwiYXNzZXQiOiIweDM2MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAiLCJhbW91bnQiOiIxMDAwIiwicGF5VG8iOiIweDFCNzlmRTQyMGEyMTFmNTVGODhCNDZBZDU4MzkwNTcyQzE0NzNBMzMiLCJtYXhUaW1lb3V0U2Vjb25kcyI6NjA0OTAwLCJleHRyYSI6eyJuYW1lIjoiR2F0ZXdheVdhbGxldEJhdGNoZWQiLCJ2ZXJzaW9uIjoiMSIsInZlcmlmeWluZ0NvbnRyYWN0IjoiMHgwMDc3Nzc3ZDdlYmE0Njg4YmRlZjNlMzExYjg0NmYyNTg3MGExOWI5In19fQ==\"}",
+    "[2026-05-19T00:55:16.211Z] [HELIX] HTTP Request to: http://localhost:4021/item",
+    "[2026-05-19T00:55:16.211Z] [HELIX] Headers (safe): {\"Content-Type\":\"application/json\"}",
+    "[2026-05-19T00:55:16.224Z] [HELIX] HTTP Request to: http://localhost:4021/item",
+    "[2026-05-19T00:55:16.224Z] [HELIX] Headers (safe): {\"Content-Type\":\"application/json\",\"Payment-Signature\":\"[REDACTED-BY-HELIX]\"}"
+  ]
+}
