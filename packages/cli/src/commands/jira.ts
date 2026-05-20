@@ -4,7 +4,8 @@ import * as fs from 'fs';
 import { Command } from 'commander';
 import { openGeneMap } from '../pcec/db';
 import { encrypt, generateWebhookSecret } from '../jira/encryption';
-import { loadJiraClient, processWebhook, startWebhookServer, WebhookContext } from '../jira/webhook-server';
+import { loadJiraClient, processWebhook, startWebhookServer, WebhookContext, WebhookDeps } from '../jira/webhook-server';
+import { triageProgrammatic, runProgrammatic } from '../programmatic';
 import { getConfig } from './init';
 
 interface ConnectOpts {
@@ -118,7 +119,13 @@ async function jiraSync(issueKey: string): Promise<void> {
   db.close();
 
   console.log(chalk.dim(`Sync started — webhookId=${webhookId}`));
-  await processWebhook(webhookId, { issue, webhookEvent: 'manual_sync' }, ctx);
+  const deps: WebhookDeps = {
+    credentialsProvider: loadJiraClient,
+    triage: triageProgrammatic,
+    run: runProgrammatic,
+    openDb: openGeneMap,
+  };
+  await processWebhook(webhookId, { issue, webhookEvent: 'manual_sync' }, ctx, deps);
   console.log(chalk.green(`✅ Sync complete. Check DB: SELECT * FROM jira_webhooks WHERE id=${webhookId}`));
 }
 
