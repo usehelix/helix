@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { GHIssue } from '../github/client';
+import { IssueRef, branchName as makeBranchName, prTitle as makePrTitle } from './issue-ref';
 
 export interface ExecutionStep {
   index: number;
@@ -10,7 +10,6 @@ export interface ExecutionStep {
 
 export interface ExecutionPlan {
   taskId: string;
-  issue: GHIssue;
   steps: ExecutionStep[];
   estimatedFiles: string[];
   testCommand: string;
@@ -37,7 +36,7 @@ const DEFAULT_STEPS: ExecutionStep[] = [
 ];
 
 export async function generatePlan(
-  issue: GHIssue,
+  ref: IssueRef,
   _repoPath: string
 ): Promise<ExecutionPlan> {
   let parsed: { steps?: ExecutionStep[]; estimatedFiles?: string[]; testCommand?: string; prTitle?: string } = {};
@@ -49,12 +48,12 @@ export async function generatePlan(
       max_tokens: 1000,
       messages: [{
         role: 'user',
-        content: `You are analyzing a GitHub issue to create an execution plan.
+        content: `You are analyzing an issue to create an execution plan.
 
-Issue Title: ${issue.title}
+Issue Title: ${ref.title}
 
 Issue Body:
-${issue.body}
+${ref.body}
 
 For TypeScript/Next.js repos, look for the most specific file path. Respond ONLY with raw JSON, no markdown backticks.
 
@@ -80,15 +79,12 @@ For TypeScript/Next.js repos, look for the most specific file path. Respond ONLY
     parsed = {};
   }
 
-  const branchName = `vialos/fix-issue-${issue.number}-${Date.now()}`;
-
   return {
-    taskId: `task-${issue.number}-${Date.now()}`,
-    issue,
+    taskId: `task-${ref.source}-${ref.id}-${Date.now()}`,
     steps: parsed.steps && parsed.steps.length > 0 ? parsed.steps : DEFAULT_STEPS,
     estimatedFiles: parsed.estimatedFiles || [],
     testCommand: parsed.testCommand || 'npm test',
-    branchName,
-    prTitle: parsed.prTitle || `fix: ${issue.title}`,
+    branchName: makeBranchName(ref),
+    prTitle: parsed.prTitle || makePrTitle(ref),
   };
 }

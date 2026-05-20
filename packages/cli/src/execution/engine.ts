@@ -6,6 +6,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import Database from 'better-sqlite3';
 import { Octokit } from '@octokit/rest';
 import { ExecutionPlan } from './planner';
+import { IssueRef, prBodyCloseLine } from './issue-ref';
 import { perceive, PerceiveResult } from '../pcec/perceive';
 import { construct, buildPromptWithCapsule, CapsuleHit } from '../pcec/construct';
 import { commit, detectAndCorrectMisclassification } from '../pcec/commit';
@@ -33,6 +34,7 @@ interface FixChange {
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export async function executeplan(
   plan: ExecutionPlan,
+  ref: IssueRef,
   repoPath: string,
   githubToken: string,
   owner: string,
@@ -44,7 +46,7 @@ export async function executeplan(
   // ── PCEC Step 1: PERCEIVE ──
   // Classify the issue into a failure_code so we can look up matching capsules.
   // Computed outside the try block so commit() in the catch block can reference it.
-  const perceiveResult: PerceiveResult = await perceive(plan.issue.title, plan.issue.body || '');
+  const perceiveResult: PerceiveResult = await perceive(ref.title, ref.body);
   console.log(`  [PCEC] Perceived: ${perceiveResult.failure_code} (${Math.round(perceiveResult.confidence * 100)}%)`);
 
   // ── PCEC Step 2: CONSTRUCT — Gene Map lookup ──
@@ -82,9 +84,9 @@ export async function executeplan(
         max_tokens: 500,
         messages: [{
           role: 'user',
-          content: `Issue: ${plan.issue.title}
+          content: `Issue: ${ref.title}
 
-Body: ${plan.issue.body}
+Body: ${ref.body}
 
 What file(s) in a Node.js/TypeScript project would contain this code?
 List only the most likely 1-3 file paths relative to project root.
@@ -109,10 +111,10 @@ Format: one path per line, no explanation.`,
     // 3. Ask Claude for the exact code change — injecting Gene Map hint if available.
     const baseFixPrompt = `You are fixing a bug in a TypeScript/Node.js project.
 
-Issue: ${plan.issue.title}
+Issue: ${ref.title}
 
 Description:
-${plan.issue.body}
+${ref.body}
 
 Current file contents:
 ${fileContext}
@@ -184,7 +186,7 @@ Rules:
 
     // 6. Commit + push.
     execSync(`git add ${filesChanged.map(f => `'${f}'`).join(' ')}`, { cwd: repoPath, stdio: 'pipe' });
-    const commitMsg = `${plan.prTitle} (closes #${plan.issue.number})`;
+    const commitMsg = `${plan.prTitle} (${prBodyCloseLine(ref)})`;
     execSync(`git commit -m ${JSON.stringify(commitMsg)}`, { cwd: repoPath, stdio: 'pipe' });
     execSync(`git push origin ${plan.branchName}`, { cwd: repoPath, stdio: 'pipe' });
 
@@ -199,7 +201,7 @@ Rules:
       title: plan.prTitle,
       head: plan.branchName,
       base: baseBranch,
-      body: buildPRBody(plan, filesChanged, testsPassed),
+      body: buildPRBody(plan, ref, filesChanged, testsPassed),
     });
 
     // Gather the actual diff for hint-usage scoring + reverse classification.
@@ -221,7 +223,9 @@ Rules:
           prUrl: pr.data.html_url,
           success: true,
           repoName: `${owner}/${repo}`,
-          issueNumber: plan.issue.number,
+          issueNumber: parseInt(ref.id, 10) || 0,
+          issueSource: ref.source,
+          issueId: ref.id,
         });
         console.log(`  [PCEC] Gene Capsule saved (${perceiveResult.failure_code})`);
       } catch (commitErr: any) {
@@ -237,7 +241,7 @@ Rules:
       detectAndCorrectMisclassification(
         perceiveResult.failure_code,
         actualDiff,
-        plan.issue.title,
+        ref.title,
       ).then(result => {
         if (result.corrected) {
           console.log(`  [PCEC] Reclassified: ${perceiveResult.failure_code} → ${result.actualCode}`);
@@ -269,7 +273,9 @@ Rules:
           prUrl: '',
           success: false,
           repoName: `${owner}/${repo}`,
-          issueNumber: plan.issue.number,
+          issueNumber: parseInt(ref.id, 10) || 0,
+          issueSource: ref.source,
+          issueId: ref.id,
         });
       } catch { /* ignore */ }
       finally {
@@ -287,9 +293,9 @@ Rules:
   }
 }
 
-function buildPRBody(plan: ExecutionPlan, filesChanged: string[], testsPassed: boolean): string {
+function buildPRBody(plan: ExecutionPlan, ref: IssueRef, filesChanged: string[], testsPassed: boolean): string {
   return `## Summary
-Fixes #${plan.issue.number} — ${plan.issue.title}
+${prBodyCloseLine(ref)} — ${ref.title}
 
 ## Changes
 ${filesChanged.map(f => `- \`${f}\``).join('\n')}
@@ -298,7 +304,7 @@ ${filesChanged.map(f => `- \`${f}\``).join('\n')}
 ${testsPassed ? '✅ Tests passing' : '⚠️ Tests not verified — please review manually'}
 
 ## Root Cause
-${(plan.issue.body ?? '').slice(0, 300)}...
+${ref.body.slice(0, 300)}...
 
 ---
 *Opened by [VialOS](https://github.com/adrianhihi/helix) — Ticket-to-PR automation*`;

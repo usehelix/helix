@@ -7,6 +7,7 @@ import { GitHubClient, GHIssue } from '../github/client';
 import { assessActionability } from '../triage/actionability';
 import { generatePlan } from '../execution/planner';
 import { executeplan } from '../execution/engine';
+import { ghIssueToRef } from '../execution/issue-ref';
 import { getConfig } from './init';
 import { openGeneMap } from '../pcec/db';
 
@@ -67,7 +68,8 @@ export async function runCommand(issueRef: string, options: RunOptions): Promise
 
   // 4. Generate execution plan
   const planSpinner = ora('Generating execution plan...').start();
-  const plan = await generatePlan(issue!, repoPath);
+  const ref = ghIssueToRef(issue!);
+  const plan = await generatePlan(ref, repoPath);
   planSpinner.succeed('Execution plan ready');
 
   // Gene Map status — short, non-blocking line
@@ -113,7 +115,7 @@ export async function runCommand(issueRef: string, options: RunOptions): Promise
   console.log();
 
   const execSpinner = ora('Analyzing codebase + applying fix...').start();
-  const result = await executeplan(plan, repoPath, config.githubToken, owner, repo);
+  const result = await executeplan(plan, ref, repoPath, config.githubToken, owner, repo);
 
   if (!result.success) {
     execSpinner.fail('Execution failed');

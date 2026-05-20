@@ -17,6 +17,10 @@ export interface CommitInput {
   success: boolean;
   repoName: string;
   issueNumber: number;
+  /** Where the issue lives — 'github' | 'jira' | 'linear'. */
+  issueSource?: string;
+  /** Source-specific id ('123' for GH, 'HELIX-1' for Jira). */
+  issueId?: string;
 }
 
 const STOP_WORDS = new Set([
@@ -119,8 +123,9 @@ export function commit(db: Database.Database, input: CommitInput): void {
         strategy, hint,
         q_value, success_count,
         source_issue_number, source_repo,
-        shareable
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        shareable,
+        issue_source, issue_id
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       input.perceiveResult.failure_code,
       input.perceiveResult.category,
@@ -134,6 +139,8 @@ export function commit(db: Database.Database, input: CommitInput): void {
       input.issueNumber,
       input.repoName,
       0,
+      input.issueSource ?? 'github',
+      input.issueId ?? String(input.issueNumber),
     );
   }
 

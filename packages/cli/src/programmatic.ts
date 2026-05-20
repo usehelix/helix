@@ -17,6 +17,7 @@ import { generatePlan, ExecutionPlan } from './execution/planner';
 import { executeplan, ExecutionResult } from './execution/engine';
 import { TriageInput } from './jira/perceive-adapter';
 import { GHIssue } from './github/client';
+import { IssueRef, ghIssueToRef } from './execution/issue-ref';
 
 export interface ProgrammaticTriageResult {
   actionable: boolean;
@@ -103,30 +104,24 @@ export interface ProgrammaticRunResult {
 export async function runProgrammatic(opts: ProgrammaticRunInput): Promise<ProgrammaticRunResult> {
   const { input, owner, repo, githubToken, repoPath } = opts;
 
-  // Build a synthetic GHIssue (executeplan consumes plan.issue.number for branch + commit msg)
-  const syntheticIssue: GHIssue = {
-    number: input.source === 'github' ? parseInt(input.sourceId, 10) || 0 : -1,
+  // Build a source-aware IssueRef. No more number=-1 hacks.
+  if (input.source === 'manual') {
+    throw new Error('runProgrammatic does not support source="manual"; pass github or jira');
+  }
+  const ref: IssueRef = {
+    source: input.source,
+    id: input.sourceId,
     title: input.title,
     body: input.body,
-    state: 'open',
-    labels: input.labels.map(name => ({ name })),
-    html_url: input.source === 'github' ? `https://github.com/${owner}/${repo}/issues/${input.sourceId}` : `jira:${input.sourceId}`,
-    user: null,
-    created_at: new Date().toISOString(),
+    url: input.source === 'github'
+      ? `https://github.com/${owner}/${repo}/issues/${input.sourceId}`
+      : `external:${input.sourceId}`,
+    displayName: input.source === 'github' ? `#${input.sourceId}` : input.sourceId,
   };
 
-  // Override the branch name to encode the source.
-  const plan: ExecutionPlan = await generatePlan(syntheticIssue, repoPath);
-  if (input.source === 'jira') {
-    plan.branchName = `vialos/fix-jira-${input.sourceId.toLowerCase()}-${Date.now()}`;
-    plan.prTitle = plan.prTitle.includes(input.sourceId)
-      ? plan.prTitle
-      : `${plan.prTitle} [${input.sourceId}]`;
-  }
+  const plan: ExecutionPlan = await generatePlan(ref, repoPath);
 
-  // executeplan reads back the capsule hit + writes a commit; we also need to
-  // return geneMapHit/qValue so the webhook can include it in the addComment.
-  // Re-query (cheap) so the result is accurate at run-start time.
+  // Re-query Gene Map for return-value purposes (executeplan also does this internally).
   const perceived = await perceive(input.title, input.body);
   let qValue = 0;
   let geneMapHit = false;
@@ -140,7 +135,7 @@ export async function runProgrammatic(opts: ProgrammaticRunInput): Promise<Progr
     db.close();
   } catch { /* non-fatal */ }
 
-  const result: ExecutionResult = await executeplan(plan, repoPath, githubToken, owner, repo);
+  const result: ExecutionResult = await executeplan(plan, ref, repoPath, githubToken, owner, repo);
 
   return {
     success: result.success,

@@ -14,7 +14,7 @@ export interface Migration {
   up: (db: Database.Database) => void;
 }
 
-export const CURRENT_SCHEMA_VERSION = 17;
+export const CURRENT_SCHEMA_VERSION = 18;
 
 export const migrations: Migration[] = [
   {
@@ -262,6 +262,14 @@ export const migrations: Migration[] = [
         webhook_secret TEXT NOT NULL,
         created_at INTEGER NOT NULL
       )`);
+    },
+  },
+  {
+    version: 18,
+    description: 'IssueRef metadata on coding capsules (issue_source + issue_id)',
+    up: (db) => {
+      try { db.exec(`ALTER TABLE gene_capsules_coding ADD COLUMN issue_source TEXT DEFAULT 'github'`); } catch { /* exists */ }
+      try { db.exec(`ALTER TABLE gene_capsules_coding ADD COLUMN issue_id TEXT`); } catch { /* exists */ }
     },
   },
 ];

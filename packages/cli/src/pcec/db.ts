@@ -40,6 +40,10 @@ function ensureSchema(db: Database.Database): void {
   try { db.exec(`ALTER TABLE gene_capsules_coding ADD COLUMN hint_used_count INTEGER DEFAULT 0`); } catch { /* already exists */ }
   try { db.exec(`ALTER TABLE gene_capsules_coding ADD COLUMN hint_ignored_count INTEGER DEFAULT 0`); } catch { /* already exists */ }
 
+  // v4: IssueRef metadata (mirrors packages/core migration #18).
+  try { db.exec(`ALTER TABLE gene_capsules_coding ADD COLUMN issue_source TEXT DEFAULT 'github'`); } catch { /* already exists */ }
+  try { db.exec(`ALTER TABLE gene_capsules_coding ADD COLUMN issue_id TEXT`); } catch { /* already exists */ }
+
   // v3: Jira webhook tables (mirrors packages/core migration #17).
   db.exec(`CREATE TABLE IF NOT EXISTS jira_webhooks (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
