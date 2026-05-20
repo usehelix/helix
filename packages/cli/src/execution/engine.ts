@@ -11,6 +11,8 @@ import { perceive, PerceiveResult } from '../pcec/perceive';
 import { construct, buildPromptWithCapsule, CapsuleHit } from '../pcec/construct';
 import { commit, detectAndCorrectMisclassification } from '../pcec/commit';
 import { openGeneMap } from '../pcec/db';
+import { errors } from '../errors/factories';
+import { wrapClaudeCall } from '../errors/wrap';
 
 const execAsync = promisify(exec);
 
@@ -22,6 +24,11 @@ export interface ExecutionResult {
   filesChanged: string[];
   testsRun: boolean;
   testsPassed: boolean;
+}
+
+export interface RunOptions {
+  /** Skip the test step before pushing. PR body will annotate this. */
+  skipTests?: boolean;
 }
 
 interface FixChange {
@@ -39,7 +46,9 @@ export async function executeplan(
   githubToken: string,
   owner: string,
   repo: string,
+  options: RunOptions = {},
 ): Promise<ExecutionResult> {
+  const skipTests = !!options.skipTests;
   const client = new Anthropic();
   const filesChanged: string[] = [];
 
@@ -79,7 +88,7 @@ export async function executeplan(
     }
 
     if (!fileContext) {
-      const searchResponse = await client.messages.create({
+      const searchResponse = await wrapClaudeCall(() => client.messages.create({
         model: 'claude-opus-4-7',
         max_tokens: 500,
         messages: [{
@@ -92,7 +101,7 @@ What file(s) in a Node.js/TypeScript project would contain this code?
 List only the most likely 1-3 file paths relative to project root.
 Format: one path per line, no explanation.`,
         }],
-      });
+      }));
 
       const searchText = searchResponse.content[0].type === 'text'
         ? searchResponse.content[0].text
@@ -139,11 +148,11 @@ Rules:
 
     const fixPrompt = buildPromptWithCapsule(baseFixPrompt, capsuleHit);
 
-    const fixResponse = await client.messages.create({
+    const fixResponse = await wrapClaudeCall(() => client.messages.create({
       model: 'claude-opus-4-7',
       max_tokens: 3000,
       messages: [{ role: 'user', content: fixPrompt }],
-    });
+    }));
 
     const fixText = fixResponse.content[0].type === 'text'
       ? fixResponse.content[0].text
@@ -171,17 +180,60 @@ Rules:
       filesChanged.push(change.file);
     }
 
-    // 5. Run tests (best-effort — failure is logged but does not block PR creation).
+    // 5. Run tests. On failure: save the diff to .helix/last-diff.patch, reset
+    //    the working tree, and throw a friendly HelixError so we DON'T push a
+    //    broken fix. With --skip-tests the PR body annotates the warning instead.
     let testsPassed = false;
     let testsRun = false;
-    try {
-      await execAsync(plan.testCommand, { cwd: repoPath, timeout: 120000 });
-      testsPassed = true;
-      testsRun = true;
-    } catch (testError: any) {
-      testsRun = true;
-      testsPassed = false;
-      console.error('Tests failed:', String(testError.message ?? testError).slice(0, 200));
+    if (skipTests) {
+      console.log('  [helix] --skip-tests: not running tests before push');
+    } else {
+      try {
+        await execAsync(plan.testCommand, { cwd: repoPath, timeout: 120000 });
+        testsPassed = true;
+        testsRun = true;
+      } catch (testError: any) {
+        testsRun = true;
+        testsPassed = false;
+        console.error('Tests failed:', String(testError.message ?? testError).slice(0, 200));
+
+        // Save the diff before resetting so the user can recover the fix.
+        const diffDir = path.join(repoPath, '.helix');
+        const diffPath = path.join(diffDir, 'last-diff.patch');
+        try {
+          fs.mkdirSync(diffDir, { recursive: true });
+          const diffOutput = execSync('git diff', { cwd: repoPath }).toString();
+          fs.writeFileSync(diffPath, diffOutput);
+        } catch { /* best-effort — fall through to error */ }
+
+        // Reset working tree so we don't leave half-applied state behind.
+        try {
+          execSync('git reset --hard HEAD', { cwd: repoPath, stdio: 'pipe' });
+        } catch { /* non-fatal */ }
+
+        // PCEC: commit the failure so q-value decays on the matched capsule.
+        if (db) {
+          try {
+            commit(db, {
+              perceiveResult,
+              strategy: 'tests_failed',
+              filesChanged,
+              prUrl: '',
+              success: false,
+              repoName: `${owner}/${repo}`,
+              issueNumber: parseInt(ref.id, 10) || 0,
+              issueSource: ref.source,
+              issueId: ref.id,
+            });
+          } catch { /* ignore */ }
+          db.close();
+        }
+
+        // Approximate failure count from stderr; fall back to 1.
+        const failureMatch = String(testError.message ?? '').match(/(\d+) failed/i);
+        const failureCount = failureMatch ? Number(failureMatch[1]) : 1;
+        throw errors.testsFailed(plan.testCommand, failureCount);
+      }
     }
 
     // 6. Commit + push.
@@ -190,19 +242,29 @@ Rules:
     execSync(`git commit -m ${JSON.stringify(commitMsg)}`, { cwd: repoPath, stdio: 'pipe' });
     execSync(`git push origin ${plan.branchName}`, { cwd: repoPath, stdio: 'pipe' });
 
-    // 7. Open PR.
+    // 7. Open PR. If this step fails the branch is already pushed — surface a
+    //    HelixError with the manual command so the user can recover.
     const octokit = new Octokit({ auth: githubToken });
     const repoInfo = await octokit.repos.get({ owner, repo });
     const baseBranch = repoInfo.data.default_branch;
 
-    const pr = await octokit.pulls.create({
-      owner,
-      repo,
-      title: plan.prTitle,
-      head: plan.branchName,
-      base: baseBranch,
-      body: buildPRBody(plan, ref, filesChanged, testsPassed),
-    });
+    let pr: { data: { html_url: string; number: number } };
+    try {
+      pr = await octokit.pulls.create({
+        owner,
+        repo,
+        title: plan.prTitle,
+        head: plan.branchName,
+        base: baseBranch,
+        body: buildPRBody(plan, ref, filesChanged, testsPassed, skipTests),
+      });
+    } catch (prErr: any) {
+      throw errors.githubPRCreateFailed(
+        prErr?.message ?? 'unknown error',
+        plan.branchName,
+        `${owner}/${repo}`,
+      );
+    }
 
     // Gather the actual diff for hint-usage scoring + reverse classification.
     let actualDiff = '';
@@ -259,9 +321,20 @@ Rules:
     };
   } catch (error: any) {
     // Cleanup: return to default branch so the working tree is left tidy.
+    // For PR-creation failures we leave the branch on its post-push state so
+    // the user can `gh pr create` manually — but checkout away from it to a
+    // safe spot anyway.
     try {
       execSync('git checkout main || git checkout master', { cwd: repoPath, stdio: 'pipe' });
     } catch { /* ignore */ }
+
+    // If this is already a friendly HelixError (testsFailed / githubPRCreateFailed
+    // / wrapClaudeCall translations), let it propagate so the top-level handler
+    // shows remediation. Plain errors fall through to the ExecutionResult below.
+    const isHelix = error && typeof error === 'object' && (error as { name?: string }).name === 'HelixError';
+    if (isHelix) {
+      throw error;
+    }
 
     // ── PCEC Step 4: COMMIT (failure path — decays q_value if capsule existed) ──
     if (db) {
@@ -293,7 +366,18 @@ Rules:
   }
 }
 
-function buildPRBody(plan: ExecutionPlan, ref: IssueRef, filesChanged: string[], testsPassed: boolean): string {
+function buildPRBody(
+  plan: ExecutionPlan,
+  ref: IssueRef,
+  filesChanged: string[],
+  testsPassed: boolean,
+  skipTests: boolean,
+): string {
+  const testingLine = skipTests
+    ? '⚠️ This PR was generated with --skip-tests. Verify before merging.'
+    : testsPassed
+      ? '✅ Tests passing'
+      : '⚠️ Tests not verified — please review manually';
   return `## Summary
 ${prBodyCloseLine(ref)} — ${ref.title}
 
@@ -301,7 +385,7 @@ ${prBodyCloseLine(ref)} — ${ref.title}
 ${filesChanged.map(f => `- \`${f}\``).join('\n')}
 
 ## Testing
-${testsPassed ? '✅ Tests passing' : '⚠️ Tests not verified — please review manually'}
+${testingLine}
 
 ## Root Cause
 ${ref.body.slice(0, 300)}...

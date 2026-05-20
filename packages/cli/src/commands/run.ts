@@ -10,12 +10,15 @@ import { executeplan } from '../execution/engine';
 import { ghIssueToRef } from '../execution/issue-ref';
 import { getConfig } from './init';
 import { openGeneMap } from '../pcec/db';
+import { wrapGitHubCall } from '../errors/wrap';
+import { errors } from '../errors/factories';
 
 interface RunOptions {
   autoApprove?: boolean;
   dryRun?: boolean;
   repo?: string;
   force?: boolean;
+  skipTests?: boolean;
 }
 
 export async function runCommand(issueRef: string, options: RunOptions): Promise<void> {
@@ -43,23 +46,31 @@ export async function runCommand(issueRef: string, options: RunOptions): Promise
   const spinner = ora('Reading issue...').start();
   let issue: GHIssue;
   try {
-    issue = await client.getIssue(issueNumber);
+    issue = await wrapGitHubCall(() => client.getIssue(issueNumber));
     spinner.succeed(`Issue: "${issue.title}"`);
-  } catch {
+  } catch (err) {
     spinner.fail(`Could not read issue #${issueNumber}`);
-    process.exit(1);
+    // If wrapGitHubCall already gave us a HelixError, let it bubble to the
+    // top-level wrapAction handler so the user sees remediation.
+    if (err && (err as { name?: string }).name === 'HelixError') throw err;
+    // Otherwise generic — translate to a github_repo_not_found-style hint.
+    throw errors.githubRepoNotFound(`#${issueNumber} in ${owner}/${repo}`);
   }
 
-  // 2. Actionability gate
+  // 2. Actionability gate. --force bypasses needs_info; not_actionable always blocks
+  // unless --force was passed.
   const actionability = assessActionability(issue!);
-  if (actionability.score === 'not_actionable') {
-    console.log(chalk.red(`\n🚫 Issue is not actionable: ${actionability.reason}`));
-    process.exit(1);
+  if (actionability.score === 'not_actionable' && !options.force) {
+    throw errors.issueNotActionable(
+      `#${issueNumber}`,
+      Math.round(actionability.confidence * 100),
+    );
   }
   if (actionability.score === 'needs_info' && !options.force) {
-    console.log(chalk.yellow(`\n⚠️  Issue needs more info: ${actionability.reason}`));
-    console.log(chalk.dim('   Use --force to run anyway'));
-    process.exit(1);
+    throw errors.issueNotActionable(
+      `#${issueNumber}`,
+      Math.round(actionability.confidence * 100),
+    );
   }
   console.log(chalk.green(`\n✅ Actionable (${Math.round(actionability.confidence * 100)}%)`));
 
@@ -115,7 +126,9 @@ export async function runCommand(issueRef: string, options: RunOptions): Promise
   console.log();
 
   const execSpinner = ora('Analyzing codebase + applying fix...').start();
-  const result = await executeplan(plan, ref, repoPath, config.githubToken, owner, repo);
+  const result = await executeplan(plan, ref, repoPath, config.githubToken, owner, repo, {
+    skipTests: !!options.skipTests,
+  });
 
   if (!result.success) {
     execSpinner.fail('Execution failed');
