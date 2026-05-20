@@ -2,6 +2,7 @@
 import { Command } from 'commander';
 import { initCommand } from './commands/init';
 import { triageCommand } from './commands/triage';
+import { runCommand } from './commands/run';
 
 const program = new Command();
 
@@ -23,5 +24,14 @@ program
   .option('--label <label>', 'Only scan issues with this label')
   .option('--comment', 'Auto-comment on needs-info issues asking for more details')
   .action(triageCommand);
+
+program
+  .command('run <issue>')
+  .description('Process an issue: analyze → fix → test → open PR')
+  .option('--auto-approve', 'Skip the 30s planning confirmation')
+  .option('--dry-run', 'Generate plan only, do not execute')
+  .option('--force', 'Run even on needs_info issues')
+  .option('--repo <owner/repo>', 'GitHub repo to use')
+  .action(runCommand);
 
 program.parse();
