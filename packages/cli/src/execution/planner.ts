@@ -18,6 +18,15 @@ export interface ExecutionPlan {
   prTitle: string;
 }
 
+/**
+ * Strip markdown code-fence wrapping from a Claude response. Claude often
+ * wraps JSON in ```json … ``` despite instructions; this is exposed so
+ * downstream callers (and tests) can rely on a pure helper.
+ */
+export function stripMarkdownFence(text: string): string {
+  return text.replace(/```json\n?|```\n?/g, '').trim();
+}
+
 // Default fallback plan used when the LLM is unavailable or returns malformed JSON.
 const DEFAULT_STEPS: ExecutionStep[] = [
   { index: 1, title: 'Read relevant files', description: 'Find the code related to this issue', type: 'read' },
@@ -65,9 +74,7 @@ For TypeScript/Next.js repos, look for the most specific file path. Respond ONLY
     });
 
     const text = response.content[0].type === 'text' ? response.content[0].text : '';
-    // Strip markdown fences in case the model wraps the JSON despite instructions.
-    const clean = text.replace(/```json\n?|```\n?/g, '').trim();
-    parsed = JSON.parse(clean);
+    parsed = JSON.parse(stripMarkdownFence(text));
   } catch {
     // Either no API key, network error, or unparseable response. Fall back gracefully.
     parsed = {};
