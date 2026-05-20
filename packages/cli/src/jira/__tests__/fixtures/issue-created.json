@@ -1,0 +1,60 @@
+{
+  "webhookEvent": "jira:issue_created",
+  "issue_event_type_name": "issue_created",
+  "issue": {
+    "key": "HELIX-101",
+    "fields": {
+      "summary": "bug: POST /api/users returns 500 when email contains '+' character",
+      "description": {
+        "type": "doc",
+        "version": 1,
+        "content": [
+          {
+            "type": "paragraph",
+            "content": [
+              { "type": "text", "text": "Creating a user with a '+' in their email returns 500 instead of 201." }
+            ]
+          },
+          {
+            "type": "heading",
+            "attrs": { "level": 2 },
+            "content": [{ "type": "text", "text": "Steps to reproduce" }]
+          },
+          {
+            "type": "orderedList",
+            "content": [
+              {
+                "type": "listItem",
+                "content": [
+                  { "type": "paragraph", "content": [{ "type": "text", "text": "POST /api/users with email user+test@example.com" }] }
+                ]
+              },
+              {
+                "type": "listItem",
+                "content": [
+                  { "type": "paragraph", "content": [{ "type": "text", "text": "Expected: 201 Created" }] }
+                ]
+              },
+              {
+                "type": "listItem",
+                "content": [
+                  { "type": "paragraph", "content": [{ "type": "text", "text": "Actual: 500 Internal Server Error" }] }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              { "type": "text", "text": "Acceptance criteria: accept emails with + character; existing tests still pass." }
+            ]
+          }
+        ]
+      },
+      "labels": ["helix-ready", "bug"],
+      "project": { "key": "HELIX" },
+      "status": { "name": "To Do" },
+      "issuetype": { "name": "Bug" }
+    }
+  }
+}

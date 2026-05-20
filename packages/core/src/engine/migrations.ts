@@ -14,7 +14,7 @@ export interface Migration {
   up: (db: Database.Database) => void;
 }
 
-export const CURRENT_SCHEMA_VERSION = 16;
+export const CURRENT_SCHEMA_VERSION = 17;
 
 export const migrations: Migration[] = [
   {
@@ -231,6 +231,37 @@ export const migrations: Migration[] = [
       // CLI's idempotent ensureSchema in packages/cli/src/pcec/db.ts). Tolerate.
       try { db.exec(`ALTER TABLE gene_capsules_coding ADD COLUMN hint_used_count INTEGER DEFAULT 0`); } catch { /* exists */ }
       try { db.exec(`ALTER TABLE gene_capsules_coding ADD COLUMN hint_ignored_count INTEGER DEFAULT 0`); } catch { /* exists */ }
+    },
+  },
+  {
+    version: 17,
+    description: 'Jira webhook tables — webhook event log + encrypted credentials',
+    up: (db) => {
+      db.exec(`CREATE TABLE IF NOT EXISTS jira_webhooks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        issue_key TEXT NOT NULL,
+        project_key TEXT NOT NULL,
+        event_type TEXT NOT NULL,
+        status TEXT NOT NULL,
+        skip_reason TEXT,
+        received_at INTEGER NOT NULL,
+        processed_at INTEGER,
+        capsule_id TEXT,
+        pr_url TEXT,
+        pr_number INTEGER,
+        error TEXT
+      )`);
+      db.exec(`CREATE INDEX IF NOT EXISTS idx_jira_webhooks_issue_key ON jira_webhooks(issue_key)`);
+      db.exec(`CREATE INDEX IF NOT EXISTS idx_jira_webhooks_status ON jira_webhooks(status)`);
+
+      db.exec(`CREATE TABLE IF NOT EXISTS jira_credentials (
+        workspace_id TEXT PRIMARY KEY,
+        base_url TEXT NOT NULL,
+        email TEXT NOT NULL,
+        api_token_encrypted TEXT NOT NULL,
+        webhook_secret TEXT NOT NULL,
+        created_at INTEGER NOT NULL
+      )`);
     },
   },
 ];

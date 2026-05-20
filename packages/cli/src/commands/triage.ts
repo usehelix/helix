@@ -3,6 +3,9 @@ import ora from 'ora';
 import { GitHubClient } from '../github/client';
 import { assessActionability, ActionabilityResult } from '../triage/actionability';
 import { getConfig } from './init';
+import { loadJiraClient } from '../jira/webhook-server';
+import { jiraIssueToTriageInput } from '../jira/perceive-adapter';
+import { triageProgrammatic } from '../programmatic';
 
 interface TriageResult {
   number: number;
@@ -15,7 +18,32 @@ export async function triageCommand(options: {
   label?: string;
   comment?: boolean;
   repo?: string;
+  source?: string;       // 'jira' for Jira-sourced triage of a single ticket
+  jiraKey?: string;      // Jira issue key when --source jira (positional via flag)
 }): Promise<void> {
+  // ── Jira mode: triage a single Jira ticket (no listOpenIssues) ──
+  if (options.source === 'jira') {
+    if (!options.jiraKey) {
+      console.error(chalk.red('Pass the Jira issue key via --jira-key <KEY> (e.g. --jira-key HELIX-123)'));
+      process.exit(1);
+    }
+    const { client } = loadJiraClient();
+    const issue = await client.getIssue(options.jiraKey);
+    const input = jiraIssueToTriageInput(issue);
+    const r = await triageProgrammatic(input);
+    console.log();
+    console.log(chalk.bold(`Jira ${options.jiraKey}: ${input.title}`));
+    console.log(chalk.dim('─'.repeat(55)));
+    const scoreColor = r.score === 'actionable' ? chalk.green : r.score === 'needs_info' ? chalk.yellow : chalk.red;
+    console.log(scoreColor(`  ${r.score}`), chalk.dim(`confidence=${Math.round(r.confidence * 100)}%`));
+    console.log(chalk.dim(`  perceived: ${r.perceived.failure_code} (${Math.round(r.perceived.confidence * 100)}%)`));
+    console.log(chalk.dim(`  Gene Map:  ${r.geneMapHit ? `HIT q=${r.qValue.toFixed(2)}` : 'miss'}`));
+    console.log(chalk.dim(`  reason:    ${r.reason}`));
+    console.log();
+    return;
+  }
+
+  // ── Default: GitHub mode (existing behavior) ──
   const config = getConfig();
   const [owner, repo] = options.repo
     ? options.repo.split('/')

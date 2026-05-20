@@ -4,6 +4,7 @@ import { initCommand } from './commands/init';
 import { triageCommand } from './commands/triage';
 import { runCommand } from './commands/run';
 import { geneCommand } from './commands/gene';
+import { registerJiraCommand } from './commands/jira';
 
 const program = new Command();
 
@@ -24,6 +25,8 @@ program
   .option('--repo <owner/repo>', 'GitHub repo to scan')
   .option('--label <label>', 'Only scan issues with this label')
   .option('--comment', 'Auto-comment on needs-info issues asking for more details')
+  .option('--source <source>', 'Source to triage from: "github" (default) or "jira"')
+  .option('--jira-key <key>', 'Jira issue key when --source jira (e.g. HELIX-123)')
   .action(triageCommand);
 
 program
@@ -40,5 +43,7 @@ program
   .description('View Gene Map capsules')
   .option('--list', 'List all capsules')
   .action(geneCommand);
+
+registerJiraCommand(program);
 
 program.parse();
