@@ -1,5 +1,6 @@
 import Conf from 'conf';
 import { execSync } from 'child_process';
+import { openGeneMap, GENE_MAP_DB_PATH } from '../pcec/db';
 
 interface VialConfig {
   githubToken: string;
@@ -51,6 +52,15 @@ export async function initCommand(options: { repo?: string }): Promise<void> {
   config.set('githubToken', token!);
   config.set('owner', owner);
   config.set('repo', repo);
+
+  // Bootstrap the Gene Map DB if it doesn't already exist.
+  try {
+    const db = openGeneMap();
+    db.close();
+    console.log(`  Gene Map: initialized at ${GENE_MAP_DB_PATH}`);
+  } catch (err: any) {
+    console.warn(`  Gene Map: failed to initialize (${err?.message ?? err})`);
+  }
 
   console.log(`✅ Initialized VialOS for ${owner}/${repo}`);
   console.log(`\nNext: run 'vial triage' to see which issues are actionable`);

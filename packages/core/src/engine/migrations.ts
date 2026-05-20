@@ -14,7 +14,7 @@ export interface Migration {
   up: (db: Database.Database) => void;
 }
 
-export const CURRENT_SCHEMA_VERSION = 14;
+export const CURRENT_SCHEMA_VERSION = 15;
 
 export const migrations: Migration[] = [
   {
@@ -192,6 +192,35 @@ export const migrations: Migration[] = [
       db.exec('ALTER TABLE genes_new RENAME TO genes');
       db.exec(`CREATE INDEX IF NOT EXISTS idx_genes_lookup ON genes(failure_code, category)`);
       db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_genes_unique ON genes(failure_code, category, COALESCE(api_layer, ''))`);
+    },
+  },
+  {
+    version: 15,
+    description: 'Gene Capsules for coding agent — gene_capsules_coding table',
+    up: (db) => {
+      db.exec(`CREATE TABLE IF NOT EXISTS gene_capsules_coding (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        failure_code TEXT NOT NULL,
+        category TEXT NOT NULL DEFAULT 'coding',
+        pattern TEXT,
+        typical_files TEXT,
+        issue_keywords TEXT,
+        strategy TEXT NOT NULL,
+        hint TEXT NOT NULL,
+        example_fix TEXT,
+        q_value REAL DEFAULT 0.5,
+        success_count INTEGER DEFAULT 0,
+        failure_count INTEGER DEFAULT 0,
+        total_uses INTEGER DEFAULT 0,
+        shareable INTEGER DEFAULT 0,
+        registry_synced INTEGER DEFAULT 0,
+        source_issue_number INTEGER,
+        source_repo TEXT,
+        created_at TEXT DEFAULT (datetime('now')),
+        updated_at TEXT DEFAULT (datetime('now'))
+      )`);
+      db.exec(`CREATE INDEX IF NOT EXISTS idx_capsules_coding_failure_code ON gene_capsules_coding(failure_code)`);
+      db.exec(`CREATE INDEX IF NOT EXISTS idx_capsules_coding_q_value ON gene_capsules_coding(q_value DESC)`);
     },
   },
 ];

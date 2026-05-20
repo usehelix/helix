@@ -8,6 +8,7 @@ import { assessActionability } from '../triage/actionability';
 import { generatePlan } from '../execution/planner';
 import { executeplan } from '../execution/engine';
 import { getConfig } from './init';
+import { openGeneMap } from '../pcec/db';
 
 interface RunOptions {
   autoApprove?: boolean;
@@ -68,6 +69,16 @@ export async function runCommand(issueRef: string, options: RunOptions): Promise
   const planSpinner = ora('Generating execution plan...').start();
   const plan = await generatePlan(issue!, repoPath);
   planSpinner.succeed('Execution plan ready');
+
+  // Gene Map status — short, non-blocking line
+  let geneMapStatus = 'no data yet';
+  try {
+    const db = openGeneMap();
+    const count = (db.prepare('SELECT COUNT(*) as n FROM gene_capsules_coding').get() as { n: number }).n;
+    geneMapStatus = count > 0 ? `${count} capsules — querying...` : 'empty, will learn from this run';
+    db.close();
+  } catch { /* ignore */ }
+  console.log(chalk.dim(`  Gene Map: ${geneMapStatus}`));
 
   // 5. Display plan, wait for approval
   console.log();

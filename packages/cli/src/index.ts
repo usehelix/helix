@@ -3,6 +3,7 @@ import { Command } from 'commander';
 import { initCommand } from './commands/init';
 import { triageCommand } from './commands/triage';
 import { runCommand } from './commands/run';
+import { geneCommand } from './commands/gene';
 
 const program = new Command();
 
@@ -33,5 +34,11 @@ program
   .option('--force', 'Run even on needs_info issues')
   .option('--repo <owner/repo>', 'GitHub repo to use')
   .action(runCommand);
+
+program
+  .command('gene')
+  .description('View Gene Map capsules')
+  .option('--list', 'List all capsules')
+  .action(geneCommand);
 
 program.parse();

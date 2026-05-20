@@ -3,8 +3,13 @@ import { promisify } from 'util';
 import * as path from 'path';
 import * as fs from 'fs';
 import Anthropic from '@anthropic-ai/sdk';
+import Database from 'better-sqlite3';
 import { Octokit } from '@octokit/rest';
 import { ExecutionPlan } from './planner';
+import { perceive, PerceiveResult } from '../pcec/perceive';
+import { construct, buildPromptWithCapsule, CapsuleHit } from '../pcec/construct';
+import { commit } from '../pcec/commit';
+import { openGeneMap } from '../pcec/db';
 
 const execAsync = promisify(exec);
 
@@ -35,6 +40,27 @@ export async function executeplan(
 ): Promise<ExecutionResult> {
   const client = new Anthropic();
   const filesChanged: string[] = [];
+
+  // ── PCEC Step 1: PERCEIVE ──
+  // Classify the issue into a failure_code so we can look up matching capsules.
+  // Computed outside the try block so commit() in the catch block can reference it.
+  const perceiveResult: PerceiveResult = await perceive(plan.issue.title, plan.issue.body || '');
+  console.log(`  [PCEC] Perceived: ${perceiveResult.failure_code} (${Math.round(perceiveResult.confidence * 100)}%)`);
+
+  // ── PCEC Step 2: CONSTRUCT — Gene Map lookup ──
+  let db: Database.Database | null = null;
+  let capsuleHit: CapsuleHit = { found: false };
+  try {
+    db = openGeneMap();
+    capsuleHit = construct(db, perceiveResult.failure_code);
+    if (capsuleHit.found && capsuleHit.capsule) {
+      console.log(`  [PCEC] Gene Map hit: ${capsuleHit.capsule.failure_code} (q=${capsuleHit.capsule.q_value.toFixed(2)})`);
+    } else {
+      console.log(`  [PCEC] Gene Map miss — using LLM analysis`);
+    }
+  } catch {
+    // Gene Map unavailable — proceed without it. PCEC degrades gracefully.
+  }
 
   try {
     // 1. Create new branch
@@ -80,13 +106,8 @@ Format: one path per line, no explanation.`,
       }
     }
 
-    // 3. Ask Claude for the exact code change.
-    const fixResponse = await client.messages.create({
-      model: 'claude-opus-4-7',
-      max_tokens: 3000,
-      messages: [{
-        role: 'user',
-        content: `You are fixing a bug in a TypeScript/Node.js project.
+    // 3. Ask Claude for the exact code change — injecting Gene Map hint if available.
+    const baseFixPrompt = `You are fixing a bug in a TypeScript/Node.js project.
 
 Issue: ${plan.issue.title}
 
@@ -112,8 +133,14 @@ Rules:
 - oldCode must be an EXACT substring found in the file
 - Make minimal changes to fix the specific bug
 - Follow the existing code style
-- Respond ONLY with the JSON, no markdown backticks`,
-      }],
+- Respond ONLY with the JSON, no markdown backticks`;
+
+    const fixPrompt = buildPromptWithCapsule(baseFixPrompt, capsuleHit);
+
+    const fixResponse = await client.messages.create({
+      model: 'claude-opus-4-7',
+      max_tokens: 3000,
+      messages: [{ role: 'user', content: fixPrompt }],
     });
 
     const fixText = fixResponse.content[0].type === 'text'
@@ -175,6 +202,26 @@ Rules:
       body: buildPRBody(plan, filesChanged, testsPassed),
     });
 
+    // ── PCEC Step 4: COMMIT (success path) ──
+    if (db) {
+      try {
+        commit(db, {
+          perceiveResult,
+          strategy: fixParsed.changes?.[0] ? 'code_edit' : 'unknown',
+          filesChanged,
+          prUrl: pr.data.html_url,
+          success: true,
+          repoName: `${owner}/${repo}`,
+          issueNumber: plan.issue.number,
+        });
+        console.log(`  [PCEC] Gene Capsule saved (${perceiveResult.failure_code})`);
+      } catch (commitErr: any) {
+        console.error(`  [PCEC] commit failed: ${commitErr?.message ?? commitErr}`);
+      } finally {
+        db.close();
+      }
+    }
+
     return {
       success: true,
       prUrl: pr.data.html_url,
@@ -188,6 +235,24 @@ Rules:
     try {
       execSync('git checkout main || git checkout master', { cwd: repoPath, stdio: 'pipe' });
     } catch { /* ignore */ }
+
+    // ── PCEC Step 4: COMMIT (failure path — decays q_value if capsule existed) ──
+    if (db) {
+      try {
+        commit(db, {
+          perceiveResult,
+          strategy: 'failed',
+          filesChanged,
+          prUrl: '',
+          success: false,
+          repoName: `${owner}/${repo}`,
+          issueNumber: plan.issue.number,
+        });
+      } catch { /* ignore */ }
+      finally {
+        db.close();
+      }
+    }
 
     return {
       success: false,
