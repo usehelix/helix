@@ -14,7 +14,7 @@ export interface Migration {
   up: (db: Database.Database) => void;
 }
 
-export const CURRENT_SCHEMA_VERSION = 15;
+export const CURRENT_SCHEMA_VERSION = 16;
 
 export const migrations: Migration[] = [
   {
@@ -221,6 +221,16 @@ export const migrations: Migration[] = [
       )`);
       db.exec(`CREATE INDEX IF NOT EXISTS idx_capsules_coding_failure_code ON gene_capsules_coding(failure_code)`);
       db.exec(`CREATE INDEX IF NOT EXISTS idx_capsules_coding_q_value ON gene_capsules_coding(q_value DESC)`);
+    },
+  },
+  {
+    version: 16,
+    description: 'Hint usage counters on coding capsules',
+    up: (db) => {
+      // ALTERs may fail if the columns already exist (e.g., bootstrapped via the
+      // CLI's idempotent ensureSchema in packages/cli/src/pcec/db.ts). Tolerate.
+      try { db.exec(`ALTER TABLE gene_capsules_coding ADD COLUMN hint_used_count INTEGER DEFAULT 0`); } catch { /* exists */ }
+      try { db.exec(`ALTER TABLE gene_capsules_coding ADD COLUMN hint_ignored_count INTEGER DEFAULT 0`); } catch { /* exists */ }
     },
   },
 ];

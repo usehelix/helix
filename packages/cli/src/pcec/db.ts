@@ -34,6 +34,11 @@ function ensureSchema(db: Database.Database): void {
   )`);
   db.exec(`CREATE INDEX IF NOT EXISTS idx_capsules_coding_failure_code ON gene_capsules_coding(failure_code)`);
   db.exec(`CREATE INDEX IF NOT EXISTS idx_capsules_coding_q_value ON gene_capsules_coding(q_value DESC)`);
+
+  // v2: hint-usage counters. Idempotent — ALTER fails silently if columns already exist.
+  // (Mirrors packages/core migration #16, but applied here since the CLI manages its own DB.)
+  try { db.exec(`ALTER TABLE gene_capsules_coding ADD COLUMN hint_used_count INTEGER DEFAULT 0`); } catch { /* already exists */ }
+  try { db.exec(`ALTER TABLE gene_capsules_coding ADD COLUMN hint_ignored_count INTEGER DEFAULT 0`); } catch { /* already exists */ }
 }
 
 /**

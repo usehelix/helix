@@ -8,7 +8,7 @@ import { Octokit } from '@octokit/rest';
 import { ExecutionPlan } from './planner';
 import { perceive, PerceiveResult } from '../pcec/perceive';
 import { construct, buildPromptWithCapsule, CapsuleHit } from '../pcec/construct';
-import { commit } from '../pcec/commit';
+import { commit, detectAndCorrectMisclassification } from '../pcec/commit';
 import { openGeneMap } from '../pcec/db';
 
 const execAsync = promisify(exec);
@@ -202,6 +202,13 @@ Rules:
       body: buildPRBody(plan, filesChanged, testsPassed),
     });
 
+    // Gather the actual diff for hint-usage scoring + reverse classification.
+    let actualDiff = '';
+    try {
+      const { stdout } = await execAsync('git diff HEAD~1', { cwd: repoPath });
+      actualDiff = stdout;
+    } catch { /* diff capture failure is non-fatal */ }
+
     // ── PCEC Step 4: COMMIT (success path) ──
     if (db) {
       try {
@@ -209,6 +216,8 @@ Rules:
           perceiveResult,
           strategy: fixParsed.changes?.[0] ? 'code_edit' : 'unknown',
           filesChanged,
+          actualDiff,
+          capsuleHint: capsuleHit.found ? capsuleHit.capsule?.hint : undefined,
           prUrl: pr.data.html_url,
           success: true,
           repoName: `${owner}/${repo}`,
@@ -220,6 +229,20 @@ Rules:
       } finally {
         db.close();
       }
+    }
+
+    // ── Reverse classification: fire-and-forget, doesn't block the return.
+    // Opens its own DB connection so it's safe after the main db.close() above.
+    if (actualDiff) {
+      detectAndCorrectMisclassification(
+        perceiveResult.failure_code,
+        actualDiff,
+        plan.issue.title,
+      ).then(result => {
+        if (result.corrected) {
+          console.log(`  [PCEC] Reclassified: ${perceiveResult.failure_code} → ${result.actualCode}`);
+        }
+      }).catch(() => { /* non-fatal */ });
     }
 
     return {
