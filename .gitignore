@@ -14,6 +14,7 @@ ab-test-results-v2/
 uniswap-ab-results/
 monad-ab-results/
 x402-v2-results/
+experiment-results/
 .env.save
 .env.local
 .wrangler/
