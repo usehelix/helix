@@ -343,6 +343,82 @@ export class HelixProvider {
           return { success: true, overrides: { txHashes: hashes, chunks: numChunks }, description: `Split swap: ${numChunks} chunks` };
         }
 
+        // ═══════ Circle-specific (Group 1 nanopayments, validated Apr 2026) ═══════
+
+        case 'serialize_and_backoff': {
+          // Wallets API concurrency lock — pause, signal caller to serialize
+          const delay = Number(context?.retryAfterMs ?? context?.defaultDelayMs) || 2000;
+          await sleep(Math.min(delay, 5000));
+          return {
+            success: true,
+            overrides: { _helix_serialize: true, _helix_concurrency: 1 },
+            description: `Serialized retry after ${delay}ms (Wallets API concurrency lock)`,
+          };
+        }
+
+        case 'burst_then_pace': {
+          // Gateway sliding-window — pause between bursts of N
+          const pauseMs = Number(context?.pauseMs) || 20000;
+          const burstSize = Number(context?.burstSize) || 10;
+          await sleep(pauseMs);
+          return {
+            success: true,
+            overrides: { _helix_burst_size: burstSize, _helix_pace_pause_ms: pauseMs },
+            description: `Paced retry after ${pauseMs}ms pause (Gateway sliding window)`,
+          };
+        }
+
+        case 'rotate_authorization': {
+          // EIP-3009 — generate fresh 32-byte nonce; caller must re-sign
+          const { randomBytes } = await import('node:crypto');
+          const newNonce = '0x' + randomBytes(32).toString('hex');
+          return {
+            success: true,
+            overrides: { authorization_nonce: newNonce, _helix_resign_authorization: true },
+            description: 'Generated fresh EIP-3009 nonce; caller must re-sign',
+          };
+        }
+
+        case 'wait_attestation': {
+          // CCTP — poll Circle attestation API until message is signed
+          // Requires Node 18+ for global fetch (verified — repo runs on node v24).
+          const messageHash = context?.messageHash ?? context?._messageHash;
+          if (!messageHash) {
+            return {
+              success: false,
+              overrides: {},
+              description: 'wait_attestation requires context.messageHash',
+            };
+          }
+          const pollIntervalMs = Number(context?.pollIntervalMs) || 5000;
+          const maxWaitMs = Number(context?.maxWaitMs) || 90000;
+          const env = context?.cctpEnv === 'mainnet' ? 'iris-api' : 'iris-api-sandbox';
+          const start = Date.now();
+          while (Date.now() - start < maxWaitMs) {
+            try {
+              const resp = await fetch(`https://${env}.circle.com/v1/attestations/${messageHash}`);
+              if (resp.ok) {
+                const data = (await resp.json()) as { status: string; attestation?: string };
+                if (data.status === 'complete' && data.attestation) {
+                  return {
+                    success: true,
+                    overrides: { attestation: data.attestation },
+                    description: `Attestation ready after ${Date.now() - start}ms (${env})`,
+                  };
+                }
+              }
+            } catch {
+              /* transient network — retry on next poll */
+            }
+            await sleep(pollIntervalMs);
+          }
+          return {
+            success: false,
+            overrides: {},
+            description: `Attestation not ready within ${maxWaitMs}ms (${env})`,
+          };
+        }
+
         // ═══════ Default ═══════
 
         default:
