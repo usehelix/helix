@@ -419,6 +419,98 @@ export class HelixProvider {
           };
         }
 
+        // ═══════ Experimentally-validated (Apr 2026, Arc Testnet) ═══════
+
+        case 'override_api_decimals': {
+          // Override the API's reported decimals using one of three sources,
+          // in priority order. Validated in Exp A (Apr 2026, Arc Testnet):
+          // Circle Wallets API returns decimals=18 for USDC on Arc; actual is 6.
+
+          // ── PRIORITY 1: on-chain ERC-20 decimals() (if caller can read chain) ──
+          const publicClient: any = (context as any)?.publicClient;
+          const tokenAddress = (context as any)?.tokenAddress;
+          if (publicClient && tokenAddress) {
+            try {
+              const onChainDecimals = (await publicClient.readContract({
+                address: tokenAddress as `0x${string}`,
+                abi: [{
+                  name: 'decimals',
+                  type: 'function',
+                  stateMutability: 'view',
+                  inputs: [],
+                  outputs: [{ type: 'uint8' }],
+                }],
+                functionName: 'decimals',
+              })) as number;
+              return {
+                success: true,
+                overrides: {
+                  decimals: onChainDecimals,
+                  _helix_actual_decimals: onChainDecimals,
+                  _helix_repair_source: 'on-chain',
+                },
+                description: `Read on-chain decimals=${onChainDecimals} from ${tokenAddress}`,
+              };
+            } catch {
+              /* fall through to ground-truth table */
+            }
+          }
+
+          // ── PRIORITY 2: native-asset ground-truth table ──
+          // Some chains have native USDC (no ERC-20 contract). Circle's API
+          // decimals field is unreliable for these — use a curated table.
+          const NATIVE_DECIMALS_GROUND_TRUTH: Record<string, number> = {
+            'arc-testnet:usdc': 6,
+            'arc:usdc': 6,
+            'base-sepolia:usdc': 6,
+            'base:usdc': 6,
+            'avalanche-fuji:usdc': 6,
+            'avalanche:usdc': 6,
+            // Extend as more native-USDC chains land.
+          };
+          const chain = String((context as any)?.chain ?? '').toLowerCase();
+          const symbol = String(
+            (context as any)?.token_symbol
+            ?? (failure as any)?.token_symbol
+            ?? 'usdc',
+          ).toLowerCase();
+          const key = `${chain}:${symbol}`;
+          const groundTruth = NATIVE_DECIMALS_GROUND_TRUTH[key];
+          if (groundTruth !== undefined) {
+            return {
+              success: true,
+              overrides: {
+                decimals: groundTruth,
+                _helix_actual_decimals: groundTruth,
+                _helix_repair_source: 'ground-truth-table',
+                _helix_ground_truth_key: key,
+              },
+              description: `Native asset on ${chain}: ${symbol} decimals=${groundTruth} (overriding API metadata)`,
+            };
+          }
+
+          // ── PRIORITY 3: caller-supplied expected_decimals ──
+          const apiDecimals = (context as any)?.api_reported_decimals;
+          const expectedDecimals = (context as any)?.expected_decimals;
+          if (expectedDecimals !== undefined && apiDecimals !== undefined) {
+            return {
+              success: true,
+              overrides: {
+                decimals: expectedDecimals,
+                _helix_actual_decimals: expectedDecimals,
+                _helix_repair_source: 'caller-provided',
+              },
+              description: `Caller-supplied correct decimals=${expectedDecimals} (API said ${apiDecimals})`,
+            };
+          }
+
+          return {
+            success: false,
+            overrides: {},
+            description: 'Cannot determine correct decimals; no on-chain access, no ground-truth entry, no caller-supplied value',
+          };
+        }
+
         // ═══════ Default ═══════
 
         default:
