@@ -30,6 +30,20 @@ export type ErrorCode =
   | 'wallets-api-rate-limit'
   | 'gateway-rate-limit'
   | 'gateway-nonce-used'
+  // Circle Web SDK numeric error codes (developers.circle.com/wallets/.../web-sdk)
+  | 'circle-param-missing'          // code === 1
+  | 'circle-param-invalid'          // code === 2
+  | 'circle-forbidden'              // code === 3
+  | 'circle-unauthorized'           // code === 4
+  | 'circle-retry'                  // code === 9
+  | 'circle-customer-suspended'     // code === 10
+  | 'circle-pending'                // code === 11
+  | 'circle-token-expired'          // code === 155104
+  | 'circle-insufficient-funds'     // code === 155201
+  | 'circle-exceed-withdraw-limit'  // code === 155203
+  | 'circle-pending-tx-queue-full'  // code === 155264
+  // CCTP (perceive does not emit yet; callers may emit from CCTP client code)
+  | 'cctp-attestation-pending'
   | 'unknown';
 
 // ── Failure Categories ──────────────────────────────────────────
