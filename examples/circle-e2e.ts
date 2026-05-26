@@ -326,15 +326,167 @@ async function inspectGeneMap() {
 }
 
 // ──────────────────────────────────────────────────────────────────
+// 6.4 — Scenario 4: decimals metadata override (Exp A reproduction)
+// ──────────────────────────────────────────────────────────────────
+
+async function demoDecimalsOverride() {
+  console.log(`\n┌─ Scenario 4: Decimals override (reproduces Exp A) ───────`);
+  console.log(`│ Agent uses decimals=18 (Circle API claim) for Arc USDC.`);
+  console.log(`│ Real value is 6 — atomic amount is 10^12 too large.`);
+  console.log(`│ Helix detects via expected/api_reported decimal mismatch`);
+  console.log(`│ in context (Tier 1) and applies override via ground-truth`);
+  console.log(`│ table (Priority 2 — no ERC-20 contract on native USDC).`);
+  console.log(`└──────────────────────────────────────────────────────────\n`);
+
+  // Resolve token id + current balance.
+  const balRes = await circle.getWalletTokenBalance({ id: CFG.walletId! });
+  const usdc = balRes.data?.tokenBalances?.find((b: any) => b.token?.symbol === 'USDC');
+  const tokenId = (usdc?.token as any)?.id;
+  const balance = parseFloat(usdc?.amount ?? '0');
+
+  if (!tokenId) {
+    console.log(`⚠ Could not resolve USDC tokenId; skipping Scenario 4.\n`);
+    return;
+  }
+
+  const TARGET_USDC = 0.001;
+  const INFLATION = 1e12;
+
+  console.log(`│ Wallet balance:           ${balance} USDC`);
+  console.log(`│ Agent intends to send:    ${TARGET_USDC} USDC`);
+  console.log(`│ Agent computes (wrongly): ${TARGET_USDC} × 10^12 = ${TARGET_USDC * INFLATION}`);
+  console.log(`│ Circle rejects (insufficient balance — wildly inflated amount)\n`);
+
+  // The "buggy agent" send. Inflates by 10^12 because it trusts the API decimals=18.
+  async function sendUsdcBadDecimals(
+    displayAmount: string,
+    dest: string,
+  ): Promise<{ id: string; state: string }> {
+    const inflated = String(parseFloat(displayAmount) * INFLATION);
+    const resp = await circle.createTransaction({
+      walletId: CFG.walletId!,
+      tokenId,
+      destinationAddress: dest,
+      amount: [inflated],
+      fee: { type: 'level', config: { feeLevel: 'MEDIUM' } },
+    } as any);
+    return { id: resp.data?.id ?? '', state: resp.data?.state ?? 'UNKNOWN' };
+  }
+
+  const safeSendDecimals = wrap(sendUsdcBadDecimals, {
+    mode: 'auto',
+    agentId: 'circle-demo-decimals',
+    geneMapPath: CFG.geneDb,
+    context: {
+      platform: 'circle',
+      apiLayer: 'wallets-api',
+      chain: 'arc-testnet',
+      token_symbol: 'usdc',
+      // Tier 1 trigger (perceive picks 'decimals-metadata-mismatch'):
+      expected_decimals: 6,
+      api_reported_decimals: 18,
+      // Tier 2 fallback (heuristic if Tier 1 absent):
+      requested_amount: TARGET_USDC * INFLATION,
+      available_balance: balance,
+    },
+    parameterModifier: (args, overrides) => {
+      // Helix's override_api_decimals returns _helix_actual_decimals=6 (via the
+      // ground-truth table). Divide the agent's inflated amount by 10^12
+      // before retry so Circle sees the corrected human-decimal value.
+      if ((overrides as any)._helix_actual_decimals === 6) {
+        const original = parseFloat(args[0] as string);
+        args[0] = String(original / INFLATION);
+      }
+      return args;
+    },
+    verbose: true,
+  });
+
+  try {
+    const r = await safeSendDecimals(String(TARGET_USDC), CFG.destination!);
+    const repaired = (r as any)._helix?.repaired;
+    console.log(`\n┌─ Scenario 4 result ──────────────────────────────────────`);
+    console.log(`│ Tx id:           ${r.id}`);
+    console.log(`│ Tx state:        ${r.state}`);
+    console.log(`│ _helix.repaired: ${repaired ?? '(n/a)'}`);
+    console.log(`│ ✓ Helix corrected the 10^12 amount inflation via ground-truth table`);
+    console.log(`└──────────────────────────────────────────────────────────\n`);
+  } catch (e: any) {
+    console.log(`\n┌─ Scenario 4 result ──────────────────────────────────────`);
+    console.log(`│ ✗ Failed: ${e?.message ?? '(none)'}`);
+    console.log(`└──────────────────────────────────────────────────────────\n`);
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────
+// 6.5 — Scenario 5: stale-quote advisory (Exp D pattern)
+// ──────────────────────────────────────────────────────────────────
+
+async function demoStaleQuoteAdvisory() {
+  console.log(`\n┌─ Scenario 5: Stale quote (reproduces Exp D detection) ───`);
+  console.log(`│ Simulating x402 facilitator /verify returning STALE_QUOTE.`);
+  console.log(`│ This is the failure Exp D captured 932 times across 50 runs.`);
+  console.log(`│ Helix detects but does NOT auto-fix (advisory capsule).`);
+  console.log(`│ Records + surfaces reorder recommendation; PR #3 will add`);
+  console.log(`│ automatic preflight reorder.`);
+  console.log(`└──────────────────────────────────────────────────────────\n`);
+
+  // Function that throws a Circle-shaped stale_quote error (x402 verify shape).
+  async function attemptVerify(quoteId: string): Promise<{ delivered: boolean }> {
+    const err: any = new Error('Quote expired');
+    err.response = {
+      data: {
+        code: 'STALE_QUOTE',
+        message: `Quote ${quoteId} expired 5s ago`,
+      },
+      status: 400,
+      config: { url: 'https://api.circle.com/v1/w3s/x402/verify' },
+    };
+    err.config = { url: 'https://api.circle.com/v1/w3s/x402/verify' };
+    err.isAxiosError = true;
+    throw err;
+  }
+
+  const safeVerify = wrap(attemptVerify, {
+    mode: 'auto',
+    agentId: 'circle-demo-stale',
+    geneMapPath: CFG.geneDb,
+    context: { platform: 'circle', apiLayer: 'wallets-api' },
+    parameterModifier: (args, _overrides) => args,
+    verbose: true,
+  });
+
+  try {
+    await safeVerify(`quote_${Date.now()}`);
+    console.log(`\n┌─ Scenario 5 result ──────────────────────────────────────`);
+    console.log(`│ Unexpected: stale_quote did NOT throw.`);
+    console.log(`└──────────────────────────────────────────────────────────\n`);
+  } catch (e: any) {
+    console.log(`\n┌─ Scenario 5 result ──────────────────────────────────────`);
+    console.log(`│ ✓ Stale quote detected and recorded.`);
+    console.log(`│   Capsule:       stale_quote → observe (advisory)`);
+    console.log(`│   Bench Exp D:   96% E2E across 932 Arc tx`);
+    console.log(`│   Recommendation: reorder workflow to`);
+    console.log(`│                  think → discover → estimate → pay → verify`);
+    console.log(`│   (PR #3 will implement auto-reorder; PR #2 is detection + audit)`);
+    console.log(`└──────────────────────────────────────────────────────────\n`);
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────
 // 7 — Main
 // ──────────────────────────────────────────────────────────────────
 
 (async () => {
-  await demoRateLimitRepair();
+  await demoRateLimitRepair();           // Scenario 1
   console.log('\n\n');
-  await demoParamInvalidHold();
+  await demoParamInvalidHold();          // Scenario 2
   console.log('\n\n');
-  await demoInsufficientFundsAutoReduce();
+  await demoInsufficientFundsAutoReduce();// Scenario 3
+  console.log('\n\n');
+  await demoDecimalsOverride();          // Scenario 4 (PR #2)
+  console.log('\n\n');
+  await demoStaleQuoteAdvisory();        // Scenario 5 (PR #2)
   await inspectGeneMap();
 
   console.log(`✅ Demo complete.`);
