@@ -1,0 +1,3356 @@
+{
+  "meta": {
+    "bench": "v1-vs-v2-metadata-trust",
+    "timestamp": "2026-05-26T06-25-41",
+    "iterations": 50,
+    "arcRpcUrl": "https://rpc.testnet.arc.network"
+  },
+  "summary": [
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1_detected": "decimals: 18→6",
+      "v2_detected": "decimals: API=18, known-correct=6",
+      "v1_source": "ground-truth-table",
+      "v2_source": "ground-truth-table",
+      "v1_avg_ms": "0.001",
+      "v2_avg_ms": "0.002",
+      "v2_first_ms": "0.064",
+      "v2_rest_avg_ms": "0.001"
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1_detected": "(none)",
+      "v2_detected": "(none)",
+      "v1_source": "caller-trusted",
+      "v2_source": "ground-truth-table",
+      "v1_avg_ms": "0.000",
+      "v2_avg_ms": "0.001",
+      "v2_first_ms": "0.004",
+      "v2_rest_avg_ms": "0.000"
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1_detected": "(none)",
+      "v2_detected": "symbol: API=\"USDC\", on-chain=\"USDC.e\"",
+      "v1_source": "caller-trusted",
+      "v2_source": "on-chain",
+      "v1_avg_ms": "0.000",
+      "v2_avg_ms": "0.001",
+      "v2_first_ms": "0.019",
+      "v2_rest_avg_ms": "0.001"
+    },
+    {
+      "scenario": "cache-50x",
+      "v1_detected": "decimals: 18→6",
+      "v2_detected": "decimals: API=18, known-correct=6",
+      "v1_source": "ground-truth-table",
+      "v2_source": "ground-truth-table",
+      "v1_avg_ms": "0.000",
+      "v2_avg_ms": "0.001",
+      "v2_first_ms": "0.010",
+      "v2_rest_avg_ms": "0.000"
+    }
+  ],
+  "raw": [
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.032208
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.063541,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.002875
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.002208,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.003875
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.001875,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.001041
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.001375,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000958
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.002166,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.001084
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.001416,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000917
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.001333,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000875
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.001292,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.001208
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.003583,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00525
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.005375,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.002375
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.002209,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000625
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.003333,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000459
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.0005,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000375
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000458,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000375
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000458,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000333
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000458,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.001209
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000458,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000333
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000417,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000334
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000458,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000334
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000417,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000375
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.002708,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.001166
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.001084,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000417
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000458,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000375,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000291
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000333,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.001208
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000375,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000375,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000333,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000333,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.001,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000458
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000459,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000334
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000417,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000334,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000334,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.001375
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000334,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000333,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000291
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000334,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000334,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000333,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000333,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000334,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000291
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000334,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000334,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000333,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000458,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000333,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000375
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.001334,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000333
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000334,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-wrong-decimals",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000333,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.005291
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.004292,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.0005,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.001667
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.0005,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000417,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000375,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000375,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000375,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000209
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00125,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000625,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.0005,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000334
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.0005,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000292
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00125,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000333,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000209
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000291,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000292
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000333,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000291,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000291
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000459,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000834
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000291,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000291,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.001375,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000375
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000291,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000291,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000291,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000666
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000458,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.002791,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000291,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000291,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000291,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.001375,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000292
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000334,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000209
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "arc-native-usdc-agrees",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000209
+      },
+      "v2": {
+        "detected": [],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.005875
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.019208,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000625
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.002208,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000292
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.002417,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000292
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000875,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000709,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000666,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.001209
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.00075,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.002917,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000292
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.001125,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.001,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000375
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000958,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000375
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000583,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.0005,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.00425,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000458,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000458,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000209
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000458,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.001375,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000458,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000209
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000584,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000458,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.0005,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000459,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000166
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000459,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000459,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000459,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000416,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000209
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000958,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.005125,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000458,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000459,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000459,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.001334,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000417,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000166
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000417,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000167
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000458,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000209
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.001167,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000417,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000416,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000167
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000458,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.001083
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000458,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000166
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000417,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000458,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000209
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.001083,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000458,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000209
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000416,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000167
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000417,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000166
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000625,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000458,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "erc20-wrong-symbol",
+      "v1": {
+        "detected": [],
+        "source": "caller-trusted",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "symbol: API=\"USDC\", on-chain=\"USDC.e\""
+        ],
+        "source": "on-chain",
+        "latencyMs": 0.000417,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.004542
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.01025,
+        "cacheHit": false
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000542
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00175,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000375
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00075,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000541,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.0005,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000459,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000584,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000458,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000709,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00075,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000333
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000584,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000375
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000375,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000209
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000291,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000333,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000209
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000291,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00125
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000209
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000291,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.001083
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000209
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000291,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.001167
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000291,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000209
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000291,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000209
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000291,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.001167,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000209
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000291,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000209
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.001166,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.00025
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000333,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000209
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000291,
+        "cacheHit": true
+      }
+    },
+    {
+      "scenario": "cache-50x",
+      "v1": {
+        "detected": [
+          "decimals: 18→6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000208
+      },
+      "v2": {
+        "detected": [
+          "decimals: API=18, known-correct=6"
+        ],
+        "source": "ground-truth-table",
+        "latencyMs": 0.000292,
+        "cacheHit": true
+      }
+    }
+  ]
+}

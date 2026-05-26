@@ -1,0 +1,134 @@
+{
+  "meta": {
+    "bench": "v1-vs-v2-param-repair",
+    "timestamp": "2026-05-26T06-04-04",
+    "scenarios": 5,
+    "repetitions_per_scenario": 20,
+    "total_attempts_per_arm": 100
+  },
+  "breakdown": [
+    {
+      "error_type": "idempotencyKey-rejected",
+      "v1_action": "hold_and_notify",
+      "v1_auto_fix": "no",
+      "v2_action": "strip_field",
+      "v2_target": "idempotencyKey",
+      "v2_auto_fix": "yes"
+    },
+    {
+      "error_type": "walletId-uuid-format",
+      "v1_action": "hold_and_notify",
+      "v1_auto_fix": "no",
+      "v2_action": "hold_and_notify",
+      "v2_target": "(n/a)",
+      "v2_auto_fix": "no"
+    },
+    {
+      "error_type": "amount-type-mismatch",
+      "v1_action": "hold_and_notify",
+      "v1_auto_fix": "no",
+      "v2_action": "coerce_type",
+      "v2_target": "amount",
+      "v2_auto_fix": "yes"
+    },
+    {
+      "error_type": "destinationAddress-hex-error",
+      "v1_action": "hold_and_notify",
+      "v1_auto_fix": "no",
+      "v2_action": "normalize_address",
+      "v2_target": "destinationAddress",
+      "v2_auto_fix": "yes"
+    },
+    {
+      "error_type": "fee-missing",
+      "v1_action": "hold_and_notify",
+      "v1_auto_fix": "no",
+      "v2_action": "inject_default",
+      "v2_target": "fee",
+      "v2_auto_fix": "yes"
+    }
+  ],
+  "summary": [
+    {
+      "arm": "v1 hold_and_notify",
+      "auto_fixed": "0 / 100",
+      "auto_fix_rate": "0.0%",
+      "manual_escalation_rate": "100.0%"
+    },
+    {
+      "arm": "v2 smartParamRepair",
+      "auto_fixed": "80 / 100",
+      "auto_fix_rate": "80.0%",
+      "manual_escalation_rate": "20.0%"
+    }
+  ],
+  "raw_v1": [
+    {
+      "scenario": "idempotencyKey-rejected",
+      "action": "hold_and_notify",
+      "auto_fix": false,
+      "description": "v1 escalates ALL param errors — 0% auto-fix"
+    },
+    {
+      "scenario": "idempotencyKey-rejected",
+      "action": "hold_and_notify",
+      "auto_fix": false,
+      "description": "v1 escalates ALL param errors — 0% auto-fix"
+    },
+    {
+      "scenario": "idempotencyKey-rejected",
+      "action": "hold_and_notify",
+      "auto_fix": false,
+      "description": "v1 escalates ALL param errors — 0% auto-fix"
+    },
+    {
+      "scenario": "idempotencyKey-rejected",
+      "action": "hold_and_notify",
+      "auto_fix": false,
+      "description": "v1 escalates ALL param errors — 0% auto-fix"
+    },
+    {
+      "scenario": "idempotencyKey-rejected",
+      "action": "hold_and_notify",
+      "auto_fix": false,
+      "description": "v1 escalates ALL param errors — 0% auto-fix"
+    }
+  ],
+  "raw_v2": [
+    {
+      "scenario": "idempotencyKey-rejected",
+      "action": "strip_field",
+      "field_or_resource": "idempotencyKey",
+      "auto_fix": true,
+      "description": "Stripped idempotencyKey"
+    },
+    {
+      "scenario": "idempotencyKey-rejected",
+      "action": "strip_field",
+      "field_or_resource": "idempotencyKey",
+      "auto_fix": true,
+      "description": "Stripped idempotencyKey"
+    },
+    {
+      "scenario": "idempotencyKey-rejected",
+      "action": "strip_field",
+      "field_or_resource": "idempotencyKey",
+      "auto_fix": true,
+      "description": "Stripped idempotencyKey"
+    },
+    {
+      "scenario": "idempotencyKey-rejected",
+      "action": "strip_field",
+      "field_or_resource": "idempotencyKey",
+      "auto_fix": true,
+      "description": "Stripped idempotencyKey"
+    },
+    {
+      "scenario": "idempotencyKey-rejected",
+      "action": "strip_field",
+      "field_or_resource": "idempotencyKey",
+      "auto_fix": true,
+      "description": "Stripped idempotencyKey"
+    }
+  ]
+}

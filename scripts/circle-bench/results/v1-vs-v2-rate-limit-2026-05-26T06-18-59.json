@@ -1,0 +1,56 @@
+{
+  "meta": {
+    "bench": "v1-vs-v2-rate-limit",
+    "timestamp": "2026-05-26T06-18-59",
+    "env": {
+      "trials": 1,
+      "transfersPerTrial": 20,
+      "amountUsdc": "0.0001",
+      "cooldownMs": 5000
+    },
+    "wallet": "7e0d2079-c1ba-51c8-9162-0b8b9536a0b4",
+    "tokenId": "15dc2b5d-0994-58b0-bf8c-3a0501148ee8",
+    "destination": "0xd49a5e2875a4741fc331998846298d46d1ed420f",
+    "v2Params": {
+      "chunkSize": 4,
+      "interChunkPauseMs": 1500,
+      "adaptive": true
+    }
+  },
+  "v1Trials": [
+    {
+      "arm": "v1",
+      "trial": 1,
+      "totalMs": 4831,
+      "successCount": 15,
+      "failureCount": 5,
+      "rl429s": 5
+    }
+  ],
+  "v2Trials": [
+    {
+      "arm": "v2",
+      "trial": 1,
+      "totalMs": 7208,
+      "successCount": 20,
+      "failureCount": 0,
+      "rl429s": 0
+    }
+  ],
+  "summary": [
+    {
+      "arm": "v1 serialize_and_backoff",
+      "avg_ms": 4831,
+      "success_rate": "75.0%",
+      "throughput": "3.10 tx/s",
+      "total_429s": 5
+    },
+    {
+      "arm": "v2 chunk_concurrent",
+      "avg_ms": 7208,
+      "success_rate": "100.0%",
+      "throughput": "2.77 tx/s",
+      "total_429s": 0
+    }
+  ]
+}
