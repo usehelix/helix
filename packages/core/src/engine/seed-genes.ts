@@ -23,4 +23,13 @@ export const SEED_GENES: Omit<GeneCapsule, 'id'>[] = [
   // Helix's deterministic answer for user-side param mistakes: don't retry, hand to operator.
   // qValue high (0.85) because hold_and_notify is the correct response to ANY param error.
   { failureCode: 'circle-param-invalid', category: 'auth', apiLayer: 'wallets-api', strategy: 'hold_and_notify', params: {}, successCount: 3, avgRepairMs: 5, platforms: ['circle'], qValue: 0.85, consecutiveFailures: 0 },
+  // Experimentally-validated (Apr 2026, Arc Testnet).
+  // Exp A: Circle Wallets API reports decimals=18 for USDC on Arc; actual ERC-20 value is 6.
+  // Recorded q=0.95 after live tx hash validation (one-shot, success_count=1/1).
+  { failureCode: 'decimals-metadata-mismatch', category: 'infrastructure', apiLayer: 'wallets-api', strategy: 'override_api_decimals', params: {}, successCount: 1, avgRepairMs: 850, platforms: ['circle'], qValue: 0.95, consecutiveFailures: 0 },
+  // Exp D: x402 quote TTL exceeded before settlement. Helix doesn't auto-repair —
+  // it records the failure so an agent's preflight hook can reorder its own workflow
+  // (think → discover → estimate → pay → verify). 48/50 E2E success (96%) across 932 Arc tx.
+  // Strategy 'observe' = capsule-records-only, no provider execution.
+  { failureCode: 'stale_quote', category: 'service', apiLayer: 'wallets-api', strategy: 'observe', params: { reorder_recommendation: 'think → discover → estimate → pay → verify', bench_validation: 'Exp D: 48/50 success (96% E2E) across 932 Arc Testnet tx' }, successCount: 48, avgRepairMs: 30, platforms: ['circle'], qValue: 0.96, consecutiveFailures: 0 },
 ];
