@@ -1,0 +1,120 @@
+{
+  "meta": {
+    "bench": "v1-vs-v2-rate-limit",
+    "timestamp": "2026-05-26T06-19-41",
+    "env": {
+      "trials": 5,
+      "transfersPerTrial": 20,
+      "amountUsdc": "0.0001",
+      "cooldownMs": 5000
+    },
+    "wallet": "7e0d2079-c1ba-51c8-9162-0b8b9536a0b4",
+    "tokenId": "15dc2b5d-0994-58b0-bf8c-3a0501148ee8",
+    "destination": "0xd49a5e2875a4741fc331998846298d46d1ed420f",
+    "v2Params": {
+      "chunkSize": 4,
+      "interChunkPauseMs": 1500,
+      "adaptive": true
+    }
+  },
+  "v1Trials": [
+    {
+      "arm": "v1",
+      "trial": 1,
+      "totalMs": 4807,
+      "successCount": 15,
+      "failureCount": 5,
+      "rl429s": 5
+    },
+    {
+      "arm": "v1",
+      "trial": 2,
+      "totalMs": 4660,
+      "successCount": 15,
+      "failureCount": 5,
+      "rl429s": 5
+    },
+    {
+      "arm": "v1",
+      "trial": 3,
+      "totalMs": 4685,
+      "successCount": 15,
+      "failureCount": 5,
+      "rl429s": 5
+    },
+    {
+      "arm": "v1",
+      "trial": 4,
+      "totalMs": 4791,
+      "successCount": 15,
+      "failureCount": 5,
+      "rl429s": 5
+    },
+    {
+      "arm": "v1",
+      "trial": 5,
+      "totalMs": 4857,
+      "successCount": 16,
+      "failureCount": 4,
+      "rl429s": 4
+    }
+  ],
+  "v2Trials": [
+    {
+      "arm": "v2",
+      "trial": 1,
+      "totalMs": 7354,
+      "successCount": 20,
+      "failureCount": 0,
+      "rl429s": 0
+    },
+    {
+      "arm": "v2",
+      "trial": 2,
+      "totalMs": 7335,
+      "successCount": 20,
+      "failureCount": 0,
+      "rl429s": 0
+    },
+    {
+      "arm": "v2",
+      "trial": 3,
+      "totalMs": 7441,
+      "successCount": 20,
+      "failureCount": 0,
+      "rl429s": 0
+    },
+    {
+      "arm": "v2",
+      "trial": 4,
+      "totalMs": 7123,
+      "successCount": 20,
+      "failureCount": 0,
+      "rl429s": 0
+    },
+    {
+      "arm": "v2",
+      "trial": 5,
+      "totalMs": 7247,
+      "successCount": 20,
+      "failureCount": 0,
+      "rl429s": 0
+    }
+  ],
+  "summary": [
+    {
+      "arm": "v1 serialize_and_backoff",
+      "avg_ms": 4760,
+      "success_rate": "76.0%",
+      "throughput": "3.19 tx/s",
+      "total_429s": 24
+    },
+    {
+      "arm": "v2 chunk_concurrent",
+      "avg_ms": 7300,
+      "success_rate": "100.0%",
+      "throughput": "2.74 tx/s",
+      "total_429s": 0
+    }
+  ]
+}
