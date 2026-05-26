@@ -68,6 +68,46 @@ export function circlePerceive(error: Error, context?: Record<string, unknown>):
   const base = { severity: 'medium' as const, platform, details: circleMsg, timestamp: Date.now() };
 
   // ════════════════════════════════════════════════════════════════════
+  // Tier 1 — Caller-emit: caller explicitly signals known-class failures.
+  // Routed BEFORE numeric/regex so an agent that has out-of-band info
+  // (e.g. it ALREADY knows the API metadata is wrong) gets priority.
+  // ════════════════════════════════════════════════════════════════════
+
+  // Decimals metadata mismatch — caller knows the API value differs from reality.
+  if (context?.expected_decimals !== undefined
+      && context?.api_reported_decimals !== undefined
+      && context.expected_decimals !== context.api_reported_decimals) {
+    return {
+      code: 'decimals-metadata-mismatch',
+      category: 'infrastructure',
+      severity: 'high',
+      platform: 'circle',
+      apiLayer: 'wallets-api',
+      chain: String(context?.chain ?? ''),
+      details: `API reports decimals=${context.api_reported_decimals}, expected=${context.expected_decimals}`,
+      timestamp: Date.now(),
+    };
+  }
+
+  // Stale quote — three trigger paths:
+  //   (a) caller-emit: context.stale_quote === true
+  //   (b) x402 facilitator: response.data.code === 'STALE_QUOTE'
+  //   (c) message match: "stale quote" / "quote expired"
+  if (context?.stale_quote === true
+      || (error as any)?.response?.data?.code === 'STALE_QUOTE'
+      || /stale.*quote|quote.*expired/i.test(circleMsg)) {
+    return {
+      code: 'stale_quote',
+      category: 'service',
+      severity: 'medium',
+      platform: 'circle',
+      apiLayer: detectApiLayer(error, context),
+      details: (error as any)?.response?.data?.message ?? 'Quote staleness detected (Exp D pattern)',
+      timestamp: Date.now(),
+    };
+  }
+
+  // ════════════════════════════════════════════════════════════════════
   // Web SDK numeric error codes (developers.circle.com/wallets/.../web-sdk).
   // Source of truth: error.response.data.code (verified via probe).
   // Routed BEFORE the api_layer-specific blocks so any layer that reports a
@@ -112,6 +152,31 @@ export function circlePerceive(error: Error, context?: Record<string, unknown>):
     if (circleCode === 155264) {
       return { ...base, code: 'circle-pending-tx-queue-full', category: 'service', severity: 'medium', apiLayer };
     }
+  }
+
+  // ════════════════════════════════════════════════════════════════════
+  // Tier 2 — Heuristic: if amount/balance ratio is wildly > 1, suspect
+  // decimals bug. 18-vs-6 decimal mismatch creates a 10^12 ratio; > 10^9
+  // is a strong signal that the caller computed atomic units against the
+  // wrong decimals metadata. Runs after numeric routing so explicit Circle
+  // codes still win when present.
+  // ════════════════════════════════════════════════════════════════════
+  const requestedAmount = context?.requested_amount;
+  const availableBalance = context?.available_balance;
+  if (typeof requestedAmount === 'number'
+      && typeof availableBalance === 'number'
+      && availableBalance > 0
+      && requestedAmount / availableBalance > 1e9) {
+    return {
+      code: 'decimals-metadata-mismatch',
+      category: 'infrastructure',
+      severity: 'high',
+      platform: 'circle',
+      apiLayer: 'wallets-api',
+      chain: String(context?.chain ?? ''),
+      details: `Requested ${requestedAmount} >> balance ${availableBalance} (ratio ${(requestedAmount / availableBalance).toExponential(2)}); suspect decimals bug`,
+      timestamp: Date.now(),
+    };
   }
 
   // Message-based fallbacks for cases where a numeric code isn't surfaced.

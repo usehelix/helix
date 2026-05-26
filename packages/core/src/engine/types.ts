@@ -44,6 +44,9 @@ export type ErrorCode =
   | 'circle-pending-tx-queue-full'  // code === 155264
   // CCTP (perceive does not emit yet; callers may emit from CCTP client code)
   | 'cctp-attestation-pending'
+  // Experimentally-validated codes (Apr 2026, Arc Testnet)
+  | 'decimals-metadata-mismatch'   // Circle Wallets API reports wrong ERC-20 decimals on Arc
+  | 'stale_quote'                  // x402 quote TTL exceeded before settlement (underscore is intentional — matches bench audit-log convention)
   | 'unknown';
 
 // ── Failure Categories ──────────────────────────────────────────
@@ -64,6 +67,7 @@ export type FailureCategory =
   | 'auth'
   | 'gas'
   | 'nonce'
+  | 'infrastructure'   // metadata bugs / chain-side data inconsistencies
   | 'unknown';
 
 export type Severity = 'low' | 'medium' | 'high' | 'critical';
@@ -103,6 +107,10 @@ export interface FailureClassification {
   actualBalance?: number;
   requiredAmount?: number;
   chainId?: number;
+  /** Sub-chain identifier for multi-chain platforms.
+   *  e.g. 'arc-testnet', 'base-mainnet', 'ethereum'. Distinct from chainId
+   *  (which is the numeric chain ID); chain is a human-readable label. */
+  chain?: string;
   walletAddress?: string;
   /** API sub-layer within a platform (e.g. 'wallets-api' vs 'gateway' for Circle).
    *  Threaded into Gene Map lookup so different strategies can serve different layers. */
