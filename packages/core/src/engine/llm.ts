@@ -163,6 +163,8 @@ const VALID_STRATEGIES = [
   'renew_session', 'remove_and_resubmit', 'refund_waterfall', 'switch_service',
   // Circle-specific (validated in Nanopayments Exp A2/C2, Apr 2026)
   'serialize_and_backoff', 'burst_then_pace', 'rotate_authorization', 'wait_attestation',
+  // Experimentally-validated (Apr 2026, Arc Testnet)
+  'override_api_decimals',
 ];
 
 // System prompt split into composable sections so the trace-aware variant
