@@ -464,11 +464,21 @@ async function demoStaleQuoteAdvisory() {
   } catch (e: any) {
     console.log(`\n┌─ Scenario 5 result ──────────────────────────────────────`);
     console.log(`│ ✓ Stale quote detected and recorded.`);
-    console.log(`│   Capsule:       stale_quote → observe (advisory)`);
-    console.log(`│   Bench Exp D:   96% E2E across 932 Arc tx`);
-    console.log(`│   Recommendation: reorder workflow to`);
-    console.log(`│                  think → discover → estimate → pay → verify`);
-    console.log(`│   (PR #3 will implement auto-reorder; PR #2 is detection + audit)`);
+    console.log(`│   Capsule:     stale_quote → observe (advisory)`);
+    console.log(`│   Bench Exp D: 96% E2E across 932 Arc tx`);
+    console.log(`│`);
+    console.log(`│ Repair options (caller decides based on think semantics):`);
+    console.log(`│`);
+    console.log(`│  (a) If think is quote-independent (Bench Exp D pattern):`);
+    console.log(`│      reorder to: think → discover → estimate → pay → verify`);
+    console.log(`│`);
+    console.log(`│  (b) If think reads quote.price or quote.expires_at:`);
+    console.log(`│      split think into pre-quote (selection) +`);
+    console.log(`│      post-quote (price-check) halves`);
+    console.log(`│`);
+    console.log(`│  (c) Request longer quote TTL OR refresh quote before pay`);
+    console.log(`│`);
+    console.log(`│  (PR #3 will implement automatic reorder for case (a))`);
     console.log(`└──────────────────────────────────────────────────────────\n`);
   }
 }
