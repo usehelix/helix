@@ -12,12 +12,20 @@ describe('Seed Gene Map (D9)', () => {
     expect(geneMap.immuneCount()).toBe(SEED_GENES.length);
   });
 
-  it('seed genes have correct q_values', () => {
+  it('generic priors are normalized to a neutral 0.50 (2.8.1 honesty audit)', () => {
     geneMap = new GeneMap(':memory:');
     const nonce = geneMap.lookup('verification-failed', 'signature');
     expect(nonce).not.toBeNull();
-    expect(nonce!.qValue).toBeGreaterThan(0.6);
+    // Was an unvalidated 0.70 prior in 2.8.0; demoted to a neutral 0.50 since
+    // no real repair was ever validated. Strategy unchanged.
+    expect(nonce!.qValue).toBe(0.5);
     expect(nonce!.strategy).toBe('refresh_nonce');
+
+    // No generic prior should ship ABOVE the neutral 0.50 without evidence.
+    for (const g of SEED_GENES) {
+      if (g.platforms.includes('circle')) continue; // Circle audited separately
+      expect(g.qValue).toBeLessThanOrEqual(0.5);
+    }
   });
 
   it('does not overwrite existing genes on re-seed', () => {

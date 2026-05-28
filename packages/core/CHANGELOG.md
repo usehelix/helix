@@ -1,5 +1,74 @@
 # @helix-agent/core changelog
 
+## 2.8.1 - 2026-05-28
+
+**The repair path had not been exercised against real Circle until 2.8.1's
+pre-publish testing.** (The 2.8.0 bench measured outcomes but did not route
+failures through `wrap()`'s repair loop; the canary used `wrap()` but never
+errored.) That first real exercise revealed two engine defects — the
+amount-corruption (L1) and the silent-underpay policy (L2) — and prompted a
+detection-vs-repair audit that reclassified prior "measured" q-values as
+**detection-only**. We fixed the defects and corrected the record rather than
+ship around them.
+
+### Fixed
+- **Engine no longer corrupts non-scalar amounts (L1).** `auto-detect` /
+  `applyOverrides` (and `split_transaction`) treated any payload `amount` as a
+  scalar number it could halve. Circle's API uses `amount: string[]`, so a
+  repair that touched the amount silently broke the array shape and zeroed the
+  value — turning a recoverable error into a self-inflicted "invalid parameter".
+  Amount mutation is now type-guarded: arrays, objects, and ambiguous strings
+  are never scalar-mutated; numeric strings round-trip to preserve shape.
+- **`insufficient-funds` defaults to `hold_and_notify`, not `reduce_request` (L2).**
+  Auto-halving a fixed obligation (payroll, invoice) silently underpays — a
+  contractor owed 10 must not receive 5. The correct response to "not enough
+  money" is to stop and alert the operator. `reduce_request` now fires only when
+  the caller explicitly opts in via `allowPartial: true` (meaningful for
+  best-effort transfers such as gas top-ups), and even then the L1 guard applies.
+
+### Changed — q-value reclassification (honesty)
+A detection-vs-repair audit of every non-prior capsule found that most
+"validated" q-values were validated for **detection** (we correctly classify the
+failure) but **not for repair** (the strategy actually completing the original
+call). Net result: **zero capsules are engine-repair-validated; one
+(`stale_quote`) has validated efficacy and it is advisory.** Reclassified:
+- `circle-insufficient-funds` and generic `payment-insufficient`: marked
+  **non-repairable** (`nonRepairable: true`) — Helix cannot create funds; the
+  halt is correct, there is no repair to score. q set to a neutral 0.50.
+- `wallets-api-rate-limit` (was 0.76): demoted to **0.50, detection-only**. The
+  bench's 76% was first-attempt API acceptance, not repair recovery; the
+  `serialize_and_backoff` strategy does not actually serialize and recovered ~0%
+  of rate-limited calls under real concurrency (see KNOWN_ISSUES KI-1, PR #4).
+- `stale_quote` (0.96): retained, but reclassified as **advisory (`observe`)** —
+  the 96% E2E (Exp D, 932 tx) is agent-side workflow reordering, not an in-engine
+  repair.
+- All other generic priors (0.68–0.88) normalized to **0.50** — they were
+  unvalidated priors with no supporting artifact.
+- Circle adapter `successProbability` values aligned to `seed-genes.ts` so the
+  prior is not fragmented across two sources.
+
+We would rather ship this honestly than carry confident-looking numbers we
+cannot defend.
+
+### Added
+- `WrapOptions.allowPartial` — opt-in for partial-payment strategies.
+- `WrapOptions.freezeArgs` — when true, no strategy may auto-mutate call args;
+  `parameterModifier` becomes the only path that can change them.
+- `GeneCapsule.nonRepairable` — marks halt-not-repair capsules; for these,
+  qValue is a neutral prior, not a repair-success probability.
+- `KNOWN_ISSUES.md` — tracks KI-1 (serialize_and_backoff no-op) and KI-2
+  (immune-stat inflation: halts currently count toward immuneHits/savedRevenue;
+  do not cite those figures externally until fixed).
+
+### Migration from 2.8.0
+- **Auto-detect no longer mutates non-scalar amounts.** Defensive; no correct
+  caller depended on the broken behavior, but if you relied on the engine
+  halving an array/string amount, it now leaves it intact.
+- **`insufficient-funds` now halts by default.** Callers that want the old
+  reduce-and-retry behavior must set `allowPartial: true`.
+- **q-values changed** per the audit above — seeded priors are re-seeded on next
+  load; learned q-values from real traffic are unaffected.
+
 ## 2.8.0 - 2026-05-26
 
 Three Circle-focused PRs landed since 2.7.3: a full Circle platform

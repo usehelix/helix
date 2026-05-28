@@ -230,10 +230,10 @@ export class PcecEngine {
     };
   }
 
-  private constructCandidates(failure: FailureClassification): RepairCandidate[] {
+  private constructCandidates(failure: FailureClassification, context?: RepairContext): RepairCandidate[] {
     const candidates: RepairCandidate[] = [];
     for (const adapter of this.adapters) {
-      candidates.push(...adapter.construct(failure));
+      candidates.push(...adapter.construct(failure, context));
     }
     return candidates.map((c) => ({
       ...c,
@@ -476,7 +476,7 @@ export class PcecEngine {
     }
 
     // ── CONSTRUCT ──
-    let candidates = this.constructCandidates(failure);
+    let candidates = this.constructCandidates(failure, context as RepairContext | undefined);
     if (registryCandidate) candidates.unshift(registryCandidate);
 
     // ── LLM CONSTRUCT FALLBACK (when no adapter has strategies) ──

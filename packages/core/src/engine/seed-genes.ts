@@ -9,33 +9,50 @@ import type { GeneCapsule } from './types.js';
 // when successCount=0: the q came from a bench, no live repairs are recorded yet.)
 export const SEED_GENES: Omit<GeneCapsule, 'id'>[] = [
   // ── Generic platform priors (tempo / privy / coinbase) ──
-  // Hand-seeded. q-values are unvalidated priors; successCount zeroed (no artifact).
-  { failureCode: 'nonce-mismatch', category: 'nonce', strategy: 'refresh_nonce', params: {}, successCount: 0, avgRepairMs: 180, platforms: ['tempo', 'privy', 'coinbase'], qValue: 0.85, consecutiveFailures: 0 },
-  { failureCode: 'verification-failed', category: 'signature', strategy: 'refresh_nonce', params: {}, successCount: 0, avgRepairMs: 300, platforms: ['coinbase', 'privy'], qValue: 0.7, consecutiveFailures: 0 },
-  { failureCode: 'payment-insufficient', category: 'balance', strategy: 'reduce_request', params: {}, successCount: 0, avgRepairMs: 45, platforms: ['tempo', 'privy', 'coinbase'], qValue: 0.82, consecutiveFailures: 0 },
-  { failureCode: 'rate-limited', category: 'auth', strategy: 'backoff_retry', params: { defaultDelayMs: 2000 }, successCount: 0, avgRepairMs: 2100, platforms: ['generic', 'coinbase'], qValue: 0.88, consecutiveFailures: 0 },
-  { failureCode: 'token-uninitialized', category: 'network', strategy: 'switch_network', params: {}, successCount: 0, avgRepairMs: 210, platforms: ['tempo', 'privy', 'coinbase'], qValue: 0.80, consecutiveFailures: 0 },
-  { failureCode: 'server-error', category: 'service', strategy: 'retry', params: {}, successCount: 0, avgRepairMs: 500, platforms: ['generic', 'coinbase', 'tempo'], qValue: 0.78, consecutiveFailures: 0 },
-  { failureCode: 'timeout', category: 'service', strategy: 'backoff_retry', params: { defaultDelayMs: 3000 }, successCount: 0, avgRepairMs: 3200, platforms: ['generic', 'coinbase'], qValue: 0.75, consecutiveFailures: 0 },
-  { failureCode: 'policy-violation', category: 'policy', strategy: 'split_transaction', params: {}, successCount: 0, avgRepairMs: 520, platforms: ['privy', 'coinbase'], qValue: 0.76, consecutiveFailures: 0 },
-  { failureCode: 'invalid-challenge', category: 'session', strategy: 'renew_session', params: {}, successCount: 0, avgRepairMs: 150, platforms: ['tempo'], qValue: 0.82, consecutiveFailures: 0 },
-  { failureCode: 'malformed-credential', category: 'service', strategy: 'fix_params', params: {}, successCount: 0, avgRepairMs: 50, platforms: ['privy', 'coinbase'], qValue: 0.80, consecutiveFailures: 0 },
-  { failureCode: 'tip-403', category: 'compliance', strategy: 'switch_stablecoin', params: {}, successCount: 0, avgRepairMs: 800, platforms: ['tempo'], qValue: 0.72, consecutiveFailures: 0 },
-  { failureCode: 'swap-reverted', category: 'dex', strategy: 'split_swap', params: { defaultChunks: 3 }, successCount: 0, avgRepairMs: 3500, platforms: ['tempo'], qValue: 0.68, consecutiveFailures: 0 },
-  { failureCode: 'tx-reverted', category: 'batch', strategy: 'remove_and_resubmit', params: {}, successCount: 0, avgRepairMs: 450, platforms: ['tempo', 'coinbase'], qValue: 0.74, consecutiveFailures: 0 },
+  // HONESTY (2.8.1 audit): these were hand-seeded priors of 0.68–0.88 with NO
+  // supporting artifact (successCount=0). Detection is unit-tested for some
+  // (nonce-mismatch, rate-limited, server-error, timeout); REPAIR is validated
+  // for none — no real call→error→repair→success was ever measured. A high
+  // "prior" reads to users as measured confidence, so all are normalized to a
+  // neutral 0.50. They re-climb only on real Q-learning rewards from live traffic.
+  { failureCode: 'nonce-mismatch', category: 'nonce', strategy: 'refresh_nonce', params: {}, successCount: 0, avgRepairMs: 180, platforms: ['tempo', 'privy', 'coinbase'], qValue: 0.50, consecutiveFailures: 0 },
+  { failureCode: 'verification-failed', category: 'signature', strategy: 'refresh_nonce', params: {}, successCount: 0, avgRepairMs: 300, platforms: ['coinbase', 'privy'], qValue: 0.50, consecutiveFailures: 0 },
+  // NON-REPAIRABLE. detection: validated (insufficient-balance classification
+  // is unit-tested — see error-embedding.test.ts). repair: non-applicable —
+  // Helix cannot create funds; hold_and_notify is the correct HALT, not a
+  // recovery. qValue is a neutral prior (halt-confidence), NOT a repair-success
+  // probability — was an unvalidated 0.82 in 2.8.0, demoted here. reduce_request
+  // fires only via a context-aware adapter construct when allowPartial:true.
+  { failureCode: 'payment-insufficient', category: 'balance', strategy: 'hold_and_notify', params: {}, successCount: 0, avgRepairMs: 0, platforms: ['tempo', 'privy', 'coinbase'], qValue: 0.50, nonRepairable: true, consecutiveFailures: 0 },
+  { failureCode: 'rate-limited', category: 'auth', strategy: 'backoff_retry', params: { defaultDelayMs: 2000 }, successCount: 0, avgRepairMs: 2100, platforms: ['generic', 'coinbase'], qValue: 0.50, consecutiveFailures: 0 },
+  { failureCode: 'token-uninitialized', category: 'network', strategy: 'switch_network', params: {}, successCount: 0, avgRepairMs: 210, platforms: ['tempo', 'privy', 'coinbase'], qValue: 0.50, consecutiveFailures: 0 },
+  { failureCode: 'server-error', category: 'service', strategy: 'retry', params: {}, successCount: 0, avgRepairMs: 500, platforms: ['generic', 'coinbase', 'tempo'], qValue: 0.50, consecutiveFailures: 0 },
+  { failureCode: 'timeout', category: 'service', strategy: 'backoff_retry', params: { defaultDelayMs: 3000 }, successCount: 0, avgRepairMs: 3200, platforms: ['generic', 'coinbase'], qValue: 0.50, consecutiveFailures: 0 },
+  { failureCode: 'policy-violation', category: 'policy', strategy: 'split_transaction', params: {}, successCount: 0, avgRepairMs: 520, platforms: ['privy', 'coinbase'], qValue: 0.50, consecutiveFailures: 0 },
+  { failureCode: 'invalid-challenge', category: 'session', strategy: 'renew_session', params: {}, successCount: 0, avgRepairMs: 150, platforms: ['tempo'], qValue: 0.50, consecutiveFailures: 0 },
+  { failureCode: 'malformed-credential', category: 'service', strategy: 'fix_params', params: {}, successCount: 0, avgRepairMs: 50, platforms: ['privy', 'coinbase'], qValue: 0.50, consecutiveFailures: 0 },
+  { failureCode: 'tip-403', category: 'compliance', strategy: 'switch_stablecoin', params: {}, successCount: 0, avgRepairMs: 800, platforms: ['tempo'], qValue: 0.50, consecutiveFailures: 0 },
+  { failureCode: 'swap-reverted', category: 'dex', strategy: 'split_swap', params: { defaultChunks: 3 }, successCount: 0, avgRepairMs: 3500, platforms: ['tempo'], qValue: 0.50, consecutiveFailures: 0 },
+  { failureCode: 'tx-reverted', category: 'batch', strategy: 'remove_and_resubmit', params: {}, successCount: 0, avgRepairMs: 450, platforms: ['tempo', 'coinbase'], qValue: 0.50, consecutiveFailures: 0 },
 
   // ── Circle capsules ──
   // apiLayer is REQUIRED for Gene Map UNIQUE(failure_code, category, COALESCE(api_layer, '')) — null != 'wallets-api'.
 
-  // wallets-api-rate-limit: q=0.76 hand-seeded from Bench 2.1 (v1-vs-v2-rate-limit,
-  // 5×20-concurrent Arc Testnet, measured 76% success). REAL bench measurement.
-  // Caveat: serialize_and_backoff does NOT serialize cross-instance retries
-  // (see scripts/circle-bench/results/v1-serialize-and-backoff-anomaly.md); 0.76
-  // reflects measured load-degraded success, not the 0.95 ideal. successCount=0
-  // and avgRepairMs=0: 0.76 is the measured prior, no live repairs recorded in
-  // this map yet. (The 2000ms in params is the configured backoff delay, not a
-  // measured repair latency — the bench reports per-trial wall-clock, not per-repair.)
-  { failureCode: 'wallets-api-rate-limit', category: 'auth', apiLayer: 'wallets-api', strategy: 'serialize_and_backoff', params: { defaultDelayMs: 2000 }, successCount: 0, avgRepairMs: 0, platforms: ['circle'], qValue: 0.76, consecutiveFailures: 0 },
+  // wallets-api-rate-limit: DETECTION-VALIDATED ONLY (2.8.1 audit). Demoted
+  // 0.76 → 0.50. The Bench 2.1 "76%" (v1-vs-v2-rate-limit.ts) counts FULFILLED
+  // createTransaction promises (API-accepted, NOT on-chain-settled — no
+  // getTransaction poll) and is the ambient FIRST-ATTEMPT acceptance rate: the
+  // ~5/20 calls that hit 429 engaged serialize_and_backoff, retried, and ALL
+  // hit 429 again ("permanently lost" — see results/v1-serialize-and-backoff-
+  // anomaly.md). The repair recovered ~0% at 20-concurrent, so 0.76 was NOT a
+  // repair-success rate.
+  //
+  // ⚠️ KNOWN-BROKEN STRATEGY — DO NOT re-validate without fixing first:
+  // serialize_and_backoff does NOT serialize. It sets _helix_serialize /
+  // _helix_concurrency overrides that NO caller reads, then retries in
+  // parallel. Effective fix (per-wallet semaphore / true serialization) is
+  // tracked for PR #4 alongside the v2 chunk_concurrent migration.
+  { failureCode: 'wallets-api-rate-limit', category: 'auth', apiLayer: 'wallets-api', strategy: 'serialize_and_backoff', params: { defaultDelayMs: 2000 }, successCount: 0, avgRepairMs: 0, platforms: ['circle'], qValue: 0.50, consecutiveFailures: 0 },
 
   // gateway-rate-limit: PRIOR SEED — strategy is structurally reasoned but NOT yet
   // validated by bench or telemetry. q-value is a conservative prior, not a measurement.
