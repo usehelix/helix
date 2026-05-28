@@ -23,14 +23,17 @@
  *       service takes 10-90s to produce attestation before mint can happen
  *     → fix: wait_attestation (poll attestation API)
  *
- * These distinctions were validated in Nanopayments Exp A2 / C2 (Apr 2026).
- * Using serialize_and_backoff on Gateway makes things WORSE (it's a
- * throughput window, not a concurrency lock).
+ * These layer distinctions are a DESIGN model of which throttle mechanism
+ * each Circle API uses — NOT a telemetry-validated result. Only the Wallets
+ * API rate-limit behavior has a bench artifact (Bench 2.1, 5×20-concurrent
+ * Arc Testnet); the Gateway and CCTP models are reasoned, not yet measured.
+ * By this model, applying serialize_and_backoff to the Gateway throughput
+ * window would be counterproductive (it's a window, not a concurrency lock).
  *
  * The api_layer field on FailureClassification (set by perceive.ts) is
  * what routes the failure to the correct strategy here.
  *
- * In addition to the 4 telemetry-validated strategies above, this adapter
+ * In addition to the 4 Circle-specific strategies above, this adapter
  * also recognizes 12 Web SDK numeric error codes documented at
  * developers.circle.com/wallets/user-controlled/web-sdk and routes each to
  * an EXISTING engine strategy (no new strategies introduced for these).
@@ -52,13 +55,14 @@ function construct(failure: FailureClassification): RepairCandidate[] {
   const candidates: RepairCandidate[] = [];
 
   // ════════════════════════════════════════════════════════════════
-  // Group 1 — Telemetry-validated Circle-specific strategies
-  // (Nanopayments Exp A2/C2, April 2026 — q-values are real)
+  // Group 1 — Circle-specific strategies. successProbability values are
+  // HAND-SEEDED starting points (see seed-genes.ts for per-capsule
+  // provenance), NOT telemetry rollups.
   // ════════════════════════════════════════════════════════════════
 
   // ─── Wallets API rate limit ─────────────────────────────────────
-  // Validated: q=0.95 in Helix telemetry registry
-  // Root cause: concurrency lock on wallet entity
+  // Hand-seeded q=0.76 from Bench 2.1 (5×20-concurrent Arc Testnet, 76% success).
+  // Root cause: concurrency lock on wallet entity.
   if (failure.code === 'wallets-api-rate-limit') {
     candidates.push({
       id: 'circle_serialize_walletsapi',
@@ -69,18 +73,19 @@ function construct(failure: FailureClassification): RepairCandidate[] {
       estimatedSpeedMs: 2500,
       requirements: [],
       score: 0,
-      successProbability: 0.95,
+      successProbability: 0.76,
       platform: 'circle',
       source: 'adapter',
       reasoning:
         'Circle Wallets API uses concurrency locks per wallet entity. Parallel requests get 429. ' +
-        'Serializing requests and adding backoff between retries resolves this reliably.',
+        'Serialized retry with backoff recovers most failures at low concurrency, but degrades ' +
+        'under sustained load — cross-instance retries are not yet serialized (Bench 2.1: 76%).',
     });
   }
 
   // ─── Gateway rate limit ─────────────────────────────────────────
-  // Validated: q=0.70 in Helix telemetry registry
-  // Root cause: sliding-window throughput limit
+  // PRIOR SEED — structurally reasoned (sliding-window throughput limit) but
+  // NOT yet validated by bench or telemetry. successProbability is a prior.
   if (failure.code === 'gateway-rate-limit') {
     candidates.push({
       id: 'circle_burst_pace_gateway',
@@ -91,7 +96,7 @@ function construct(failure: FailureClassification): RepairCandidate[] {
       estimatedSpeedMs: 20000,
       requirements: [],
       score: 0,
-      successProbability: 0.7,
+      successProbability: 0.5,
       platform: 'circle',
       source: 'adapter',
       reasoning:
@@ -101,9 +106,11 @@ function construct(failure: FailureClassification): RepairCandidate[] {
   }
 
   // ─── Gateway nonce reused (EIP-3009) ────────────────────────────
-  // Root cause: transferWithAuthorization requires unique nonce per
-  // (from, nonce) tuple. Reusing a nonce that has been used or revoked
-  // by cancelAuthorization fails the signature check on chain.
+  // PRIOR SEED — structurally reasoned but NOT yet validated by bench or
+  // telemetry. successProbability is a prior. Root cause:
+  // transferWithAuthorization requires unique nonce per (from, nonce) tuple.
+  // Reusing a nonce used/revoked by cancelAuthorization fails the on-chain
+  // signature check.
   if (failure.code === 'gateway-nonce-used') {
     candidates.push({
       id: 'circle_rotate_auth',
@@ -114,7 +121,7 @@ function construct(failure: FailureClassification): RepairCandidate[] {
       estimatedSpeedMs: 200,
       requirements: ['signer'],
       score: 0,
-      successProbability: 0.92,
+      successProbability: 0.5,
       platform: 'circle',
       source: 'adapter',
       reasoning:
@@ -124,9 +131,10 @@ function construct(failure: FailureClassification): RepairCandidate[] {
   }
 
   // ─── CCTP attestation pending ───────────────────────────────────
-  // Root cause: Circle attestation service has not yet signed the
-  // burn event. Burn happened on source chain but mint cannot proceed
-  // until attestation is available.
+  // PRIOR SEED — structurally reasoned but NOT yet validated by bench or
+  // telemetry. successProbability is a prior. Root cause: Circle attestation
+  // service has not yet signed the burn event; mint cannot proceed until the
+  // attestation is available.
   if (failure.code === 'cctp-attestation-pending') {
     candidates.push({
       id: 'circle_wait_attestation',
@@ -137,7 +145,7 @@ function construct(failure: FailureClassification): RepairCandidate[] {
       estimatedSpeedMs: 30000,
       requirements: ['messageHash'],
       score: 0,
-      successProbability: 0.98,
+      successProbability: 0.5,
       platform: 'circle',
       source: 'adapter',
       reasoning:
