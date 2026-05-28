@@ -155,6 +155,14 @@ export interface GeneCapsule {
   avgRepairMs: number;
   platforms: Platform[];
   qValue: number;
+  /**
+   * True when the capsule's strategy does NOT attempt to complete the
+   * original call — it correctly HALTS (e.g. hold_and_notify on
+   * insufficient funds). For these, qValue is a neutral prior / halt-
+   * confidence, NOT a repair-success probability: there is no repair to
+   * succeed. Detection may still be validated; repair is non-applicable.
+   */
+  nonRepairable?: boolean;
   qVariance?: number;
   qCount?: number;
   last5Rewards?: number[];
@@ -207,7 +215,7 @@ export interface RepairResult {
 export interface PlatformAdapter {
   name: Platform;
   perceive(error: Error, context?: Record<string, unknown>): FailureClassification | null;
-  construct(failure: FailureClassification): RepairCandidate[];
+  construct(failure: FailureClassification, context?: RepairContext): RepairCandidate[];
 }
 
 // ── Provider Config ─────────────────────────────────────────────
@@ -278,6 +286,24 @@ export interface WrapOptions {
   approvedTokens?: string[];
   allowCategories?: string[];
   blockStrategies?: string[];
+  /**
+   * Opt-in: allow partial-payment strategies (e.g. reduce_request on
+   * insufficient funds) to fire. Default false. For fixed-obligation payments
+   * (payroll, invoices) silent underpay is incorrect, so insufficient-funds
+   * defaults to hold_and_notify. Only set this for best-effort transfers
+   * (gas top-ups, swap slippage) where a reduced amount is meaningful.
+   */
+  allowPartial?: boolean;
+  /**
+   * Defense-in-depth: when true, NO repair strategy may auto-mutate the call
+   * args. The auto-detect/applyOverrides path, split_transaction, and
+   * renew_session arg-injection are all bypassed (debug-logged). Retries still
+   * happen, but with the ORIGINAL args. `parameterModifier`, if provided,
+   * remains the one authoritative way to change args. Default false (preserves
+   * existing behavior). Use for safety-critical payments where you would rather
+   * fail-safe than have Helix rewrite your payload.
+   */
+  freezeArgs?: boolean;
   provider?: HelixProviderConfig;
   onRepair?: (result: RepairResult) => void;
   onFailure?: (result: RepairResult) => void;
@@ -297,14 +323,23 @@ export interface WrapOptions {
   /** Log format. 'pretty' (colored) or 'json' (structured). Default: 'pretty'. */
   logFormat?: 'pretty' | 'json';
   /**
-   * Business-level verification after successful repair + retry.
+   * Business-level verification after a successful repair + retry.
    *
-   * Called after the retried function succeeds. If verify returns false,
-   * the repair is treated as a failure (Gene q_value decreases).
+   * Called only when a retry (after at least one repair) returns a value — it
+   * is NOT called on a first-attempt success. Use it to assert the result
+   * actually fulfilled the original intent, not merely that the call resolved
+   * (e.g. "the amount paid equals the amount requested" — catches a silent
+   * underpay). It receives the ORIGINAL args, never the repaired/mutated ones.
+   *
+   * If verify returns false (or throws):
+   *   - the gene's q_value is decremented (recordFailure), AND
+   *   - wrap() throws immediately with `_helix.verifyFailed = true` — it does
+   *     NOT re-enter PCEC or run further Self-Refine retries. The call surfaces
+   *     as a failure for the caller to handle.
    *
    * @param result - The return value of the retried function
    * @param originalArgs - The original arguments passed to wrap(fn)
-   * @returns true if the result is valid, false to treat as failure
+   * @returns true if the result is valid, false to treat as a failure
    */
   verify?: (result: unknown, originalArgs: unknown[]) => Promise<boolean> | boolean;
   /** OpenTelemetry configuration. Provide your own tracer/meter for distributed tracing and metrics. */

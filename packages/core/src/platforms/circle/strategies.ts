@@ -43,6 +43,7 @@ import type {
   PlatformAdapter,
   RepairCandidate,
   FailureClassification,
+  RepairContext,
 } from '../../engine/types.js';
 
 import { circlePerceive } from './perceive.js';
@@ -51,7 +52,7 @@ import { circlePerceive } from './perceive.js';
 // Construct: failure → candidates
 // ──────────────────────────────────────────────────────────────────
 
-function construct(failure: FailureClassification): RepairCandidate[] {
+function construct(failure: FailureClassification, context?: RepairContext): RepairCandidate[] {
   const candidates: RepairCandidate[] = [];
 
   // ════════════════════════════════════════════════════════════════
@@ -61,8 +62,14 @@ function construct(failure: FailureClassification): RepairCandidate[] {
   // ════════════════════════════════════════════════════════════════
 
   // ─── Wallets API rate limit ─────────────────────────────────────
-  // Hand-seeded q=0.76 from Bench 2.1 (5×20-concurrent Arc Testnet, 76% success).
-  // Root cause: concurrency lock on wallet entity.
+  // DETECTION-VALIDATED ONLY (2.8.1 audit). successProbability 0.76 → 0.50 to
+  // match seed-genes.ts. The Bench 2.1 "76%" was ambient first-attempt API
+  // acceptance, not repair recovery (the repair recovered ~0% of 429s at
+  // 20-concurrent). See seed-genes.ts for the full provenance.
+  //
+  // ⚠️ KNOWN-BROKEN STRATEGY: serialize_and_backoff does NOT serialize (the
+  // _helix_serialize / _helix_concurrency overrides are never consumed). Do
+  // NOT re-validate without fixing the underlying mechanism — tracked PR #4.
   if (failure.code === 'wallets-api-rate-limit') {
     candidates.push({
       id: 'circle_serialize_walletsapi',
@@ -73,13 +80,14 @@ function construct(failure: FailureClassification): RepairCandidate[] {
       estimatedSpeedMs: 2500,
       requirements: [],
       score: 0,
-      successProbability: 0.76,
+      successProbability: 0.50,
       platform: 'circle',
       source: 'adapter',
       reasoning:
         'Circle Wallets API uses concurrency locks per wallet entity. Parallel requests get 429. ' +
-        'Serialized retry with backoff recovers most failures at low concurrency, but degrades ' +
-        'under sustained load — cross-instance retries are not yet serialized (Bench 2.1: 76%).',
+        'DETECTION validated; REPAIR not validated — serialize_and_backoff is a no-op for ' +
+        'serialization and recovered ~0% of rate-limited calls at 20-concurrent (Bench 2.1). ' +
+        'Effective serialization tracked PR #4.',
     });
   }
 
@@ -191,7 +199,8 @@ function construct(failure: FailureClassification): RepairCandidate[] {
       estimatedSpeedMs: 60000,
       requirements: [],
       score: 0,
-      successProbability: 0.4,
+      // 0.50 to match seed-genes.ts (detection ✓ / non-repair halt, not a prior claim).
+      successProbability: 0.50,
       platform: 'circle',
       source: 'adapter',
       reasoning:
@@ -312,23 +321,60 @@ function construct(failure: FailureClassification): RepairCandidate[] {
     });
   }
 
-  // code === 155201 — wallet has insufficient funds
+  // code === 155201 / 155258 — wallet has insufficient funds
+  //
+  // DEFAULT: hold_and_notify. Silently reducing a fixed-obligation payment
+  // (payroll, invoice) is INCORRECT — a contractor owed 10 must not receive 5.
+  // The correct response to "not enough money" is to stop, alert the operator,
+  // and let them top up. Helix cannot conjure funds, so this is not an
+  // auto-repair — it is a safe halt.
+  //
+  // OPT-IN: reduce_request fires ONLY when the caller sets `allowPartial: true`
+  // on the wrap config — meaningful for best-effort transfers (gas top-ups,
+  // swap slippage) where a reduced amount is acceptable. Even then the L1
+  // type-guard still refuses to corrupt non-scalar amounts.
   if (failure.code === 'circle-insufficient-funds') {
-    candidates.push({
-      id: 'circle_insufficient_reduce',
-      strategy: 'reduce_request',
-      description: 'Insufficient funds — reduce amount and retry',
-      estimatedCostUsd: 0,
-      estimatedSpeedMs: 100,
-      requirements: ['amount'],
-      score: 0,
-      successProbability: 0.7,
-      platform: 'circle',
-      source: 'adapter',
-      reasoning:
-        'Code=155201 means the wallet balance < request. Either reduce to available balance or ' +
-        'caller must top up — reduce_request lets the engine try the reduced amount first.',
-    });
+    if (context?.allowPartial === true) {
+      candidates.push({
+        id: 'circle_insufficient_reduce',
+        strategy: 'reduce_request',
+        description: 'Insufficient funds — reduce amount and retry (allowPartial)',
+        estimatedCostUsd: 0,
+        estimatedSpeedMs: 100,
+        requirements: ['amount'],
+        score: 0,
+        successProbability: 0.7,
+        platform: 'circle',
+        source: 'adapter',
+        reasoning:
+          'Code=155201/155258: wallet balance < request, and the caller opted into partial ' +
+          'payments (allowPartial). Reduce toward the available balance. Only valid for ' +
+          'best-effort transfers — never for fixed obligations.',
+      });
+    } else {
+      candidates.push({
+        id: 'circle_insufficient_hold',
+        strategy: 'hold_and_notify',
+        description: 'Insufficient funds — halt and alert operator to top up',
+        estimatedCostUsd: 0,
+        estimatedSpeedMs: 60000,
+        requirements: [],
+        // NON-REPAIRABLE. detection: validated (155201/155258 probe-verified in
+        // perceive.ts). repair: non-applicable — Helix cannot create funds, so
+        // this is a HALT, not a recovery. successProbability here is the
+        // confidence that halting is the correct response, NOT a repair-success
+        // rate (was advertised as a 0.7 repair prior in 2.8.0; reclassified).
+        score: 0,
+        successProbability: 0.4,
+        platform: 'circle',
+        source: 'adapter',
+        reasoning:
+          'Code=155201/155258: wallet balance < request. This is NOT auto-repairable — Helix ' +
+          'cannot create funds. Silently reducing a fixed-obligation payment would underpay. ' +
+          'Correct behavior is to stop and notify the operator to top up. Set allowPartial:true ' +
+          'only for best-effort transfers where a reduced amount is acceptable.',
+      });
+    }
   }
 
   // code === 155203 — single-tx withdraw limit exceeded

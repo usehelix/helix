@@ -1,5 +1,9 @@
 import { describe, it, expect, afterEach } from 'vitest';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { wrap, shutdown } from '../src/engine/wrap.js';
+import { GeneMap } from '../src/engine/gene-map.js';
 
 afterEach(() => { shutdown(); });
 
@@ -162,5 +166,41 @@ describe('Business-Level Verify', () => {
     expect(capturedArgs).not.toBeNull();
     expect((capturedArgs![0] as any).to).toBe('0xRecipient');
     expect((capturedArgs![0] as any).amount).toBe(100);
+  });
+
+  // 2.8.1: an underpay that "succeeds" must be caught by verify, penalize the
+  // gene (q decremented via recordFailure), and surface as a failure WITHOUT
+  // further Self-Refine retries.
+  it('verify-false on an underpay: decrements gene q, records failure, no extra retry', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'helix-verify-'));
+    const dbPath = join(dir, 'genes.db');
+    let calls = 0;
+
+    const fn = async (p: { amount: number }) => {
+      calls++;
+      if (calls === 1) throw new Error('nonce mismatch'); // → refresh_nonce repair
+      return { amount: 50 }; // UNDERPAID: requested 100, "paid" 50
+    };
+
+    const safe = wrap(fn, {
+      mode: 'auto',
+      geneMapPath: dbPath,
+      logLevel: 'silent',
+      verify: (r: any, a: any[]) => r.amount === a[0].amount, // 50 !== 100 → false
+    });
+
+    await expect(safe({ amount: 100 })).rejects.toThrow(/business verification failed/i);
+    // verify-false exits immediately: 1 original + 1 repair-retry, NO further loop.
+    expect(calls).toBe(2);
+
+    // Inspect the persisted gene: recordFailure ran → failure counted + q down.
+    shutdown();
+    const gm = new GeneMap(dbPath);
+    const gene = gm.lookup('nonce-mismatch', 'nonce');
+    expect(gene).not.toBeNull();
+    expect(gene!.consecutiveFailures).toBeGreaterThanOrEqual(1);
+    expect(gene!.qValue).toBeLessThan(0.5); // decremented from the 0.50 seed prior
+    gm.close();
+    rmSync(dir, { recursive: true, force: true });
   });
 });

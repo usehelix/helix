@@ -52,6 +52,7 @@ export function wrap<TArgs extends unknown[], TResult>(
     const enabled = typeof options?.enabled === 'function' ? options.enabled() : (options?.enabled ?? true);
     if (!enabled) return fn(...args);
 
+    const freezeArgs = options?.freezeArgs === true;
     let currentArgs = args;
     let lastRepairResult: RepairResult | null = null;
     const refineCtx = createRefinementContext((args as any)?.[0]?.toString?.() ?? '', maxRetries);
@@ -141,6 +142,7 @@ export function wrap<TArgs extends unknown[], TResult>(
 
           const result: RepairResult = await engine.repair(wrappedError, {
             ...options?.context,
+            allowPartial: options?.allowPartial ?? (options?.context as Record<string, unknown> | undefined)?.allowPartial,
             chainId: (error as any)?.chain?.id,
             walletAddress: (error as any)?.account?.address,
             _avoidStrategies: refinement.excludeStrategies.length > 0 ? refinement.excludeStrategies : undefined,
@@ -169,6 +171,13 @@ export function wrap<TArgs extends unknown[], TResult>(
           lastStrategy = strategy;
 
           log.info(result.immune ? `IMMUNE via ${strategy}` : `REPAIRED via ${strategy}`, { ms: result.totalMs, immune: result.immune });
+
+          // freezeArgs: no strategy may auto-mutate args. parameterModifier
+          // (handled below) remains the only authoritative way to change them.
+          if (freezeArgs && (strategy === 'renew_session' || strategy === 'split_transaction')) {
+            log.debug(`freezeArgs: skipping arg-mutating strategy '${strategy}' — retrying with original args`);
+            continue;
+          }
 
           // ── renew_session: call sessionRefresher ──
           if (strategy === 'renew_session' && options?.sessionRefresher) {
@@ -210,19 +219,26 @@ export function wrap<TArgs extends unknown[], TResult>(
                 if (lastResult !== undefined) return lastResult;
               }
             } else if (sig.type === 'generic-payment') {
-              const p = currentArgs[0] as Record<string, unknown>;
-              const amt = p.amount as number | undefined;
-              if (amt && amt > 0) {
-                const partAmt = amt / parts;
-                log.info(`Splitting payment into ${parts} parts of ${partAmt}`);
-                let lastResult: TResult | undefined;
-                for (let i = 0; i < parts; i++) {
-                  try {
-                    lastResult = await fn(...([{ ...p, amount: partAmt }, ...currentArgs.slice(1)] as TArgs));
-                    if (i < parts - 1) await new Promise(r => setTimeout(r, delayMs));
-                  } catch { log.warn(`Split part ${i + 1}/${parts} failed`); }
+              // L1 guard: only split a SCALAR numeric amount. Array/object/
+              // ambiguous amounts (e.g. Circle's `amount: string[]`) must not
+              // be divided — skip split and fall through to retry-as-is.
+              if (sig.amountShape === 'number' || sig.amountShape === 'numeric-string') {
+                const p = currentArgs[0] as Record<string, unknown>;
+                const amt = Number(p.amount);
+                if (Number.isFinite(amt) && amt > 0) {
+                  const partAmt = amt / parts;
+                  // Preserve the original scalar shape (string stays a string).
+                  const partVal: unknown = sig.amountShape === 'numeric-string' ? String(partAmt) : partAmt;
+                  log.info(`Splitting payment into ${parts} parts of ${String(partVal)}`);
+                  let lastResult: TResult | undefined;
+                  for (let i = 0; i < parts; i++) {
+                    try {
+                      lastResult = await fn(...([{ ...p, amount: partVal }, ...currentArgs.slice(1)] as TArgs));
+                      if (i < parts - 1) await new Promise(r => setTimeout(r, delayMs));
+                    } catch { log.warn(`Split part ${i + 1}/${parts} failed`); }
+                  }
+                  if (lastResult !== undefined) return lastResult;
                 }
-                if (lastResult !== undefined) return lastResult;
               }
             }
             continue; // fallback: retry as-is
@@ -232,12 +248,16 @@ export function wrap<TArgs extends unknown[], TResult>(
           if (!SIMPLE_RETRY.includes(strategy)) {
             const overrides = result.commitOverrides ?? {};
 
-            // Priority 1: User parameterModifier
+            // Priority 1: User parameterModifier — authoritative, allowed even
+            // under freezeArgs (the caller is explicitly controlling mutation).
             if (options?.parameterModifier && Object.keys(overrides).length > 0) {
               currentArgs = options.parameterModifier(currentArgs as unknown[], overrides, strategy) as TArgs;
               log.info('Applied overrides via parameterModifier');
             }
-            // Priority 2: Auto-detect
+            // Priority 2: Auto-detect — bypassed entirely when freezeArgs is set.
+            else if (freezeArgs) {
+              log.debug(`freezeArgs: skipping auto-detect override for '${strategy}' — retrying with original args`);
+            }
             else {
               const sig = detectSignature(currentArgs as unknown[]);
               const applied = applyOverrides([...currentArgs] as unknown[], overrides, strategy, sig);
