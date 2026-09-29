@@ -104,7 +104,7 @@ async function callOpenAI(msg: string, key: string, model: string | undefined, s
   const r = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
-    body: JSON.stringify({ model: model ?? 'gpt-4o-mini', max_tokens: 150, temperature: 0, messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: `Classify this error:\n"${msg}"` }] }),
+    body: JSON.stringify({ model: model ?? 'gpt-4o-mini', max_completion_tokens: 150, temperature: 0, messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: `Classify this error:\n"${msg}"` }] }),
     signal,
   });
   if (!r.ok) throw new Error(`OpenAI ${r.status}`);
@@ -139,7 +139,7 @@ export async function llmGenerateReasoning(errorMessage: string, strategy: strin
       const r = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
-        body: JSON.stringify({ model: config.model ?? 'gpt-4o-mini', max_tokens: 150, temperature: 0, messages: [{ role: 'system', content: sysMsg }, { role: 'user', content: userMsg }] }),
+        body: JSON.stringify({ model: config.model ?? 'gpt-4o-mini', max_completion_tokens: 150, temperature: 0, messages: [{ role: 'system', content: sysMsg }, { role: 'user', content: userMsg }] }),
         signal: ctrl.signal,
       });
       if (!r.ok) throw new Error(`${r.status}`);
@@ -287,7 +287,7 @@ export async function llmConstructCandidates(
       const d = await r.json() as { content?: { text: string }[] };
       text = d.content?.[0]?.text ?? '';
     } else {
-      const r = await fetch('https://api.openai.com/v1/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` }, body: JSON.stringify({ model: config.model ?? 'gpt-4o-mini', max_tokens: maxTokens, temperature: 0, messages: [{ role: 'system', content: system }, { role: 'user', content: userMsg }] }), signal: ctrl.signal });
+      const r = await fetch('https://api.openai.com/v1/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` }, body: JSON.stringify({ model: config.model ?? 'gpt-4o-mini', max_completion_tokens: maxTokens, temperature: 0, messages: [{ role: 'system', content: system }, { role: 'user', content: userMsg }] }), signal: ctrl.signal });
       if (!r.ok) throw new Error(`${r.status}`);
       const d = await r.json() as { choices?: { message: { content: string } }[] };
       text = d.choices?.[0]?.message?.content ?? '';
